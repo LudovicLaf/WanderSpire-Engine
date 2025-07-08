@@ -1,0 +1,109 @@
+﻿{
+  "name": "orc",
+  "components": {
+    "NameComponent": { "name": "Orc" },
+
+    "GridPositionComponent": { "tile": [ 0, 0 ] },
+    "MovementComponent": {},
+    "PathFollowingComponent": {},
+
+    "BehaviourComponent": {
+      "wanderRadius": 2.0,
+      "wanderChance": 0.2,
+      "awarenessRange": 6,
+      "chaseRange": 12,
+      "state": 0
+    },
+
+    "StateMachineComponent": {
+      "fsmFile": "ai/basic_melee.fsm.json",
+      "current": ""
+    },
+
+    "AnimationStateComponent": { "state": 0 },
+
+    "SpriteComponent": {
+      "atlasName": "orc_sheet",
+      "frameName": ""
+    },
+
+    "SpriteAnimationComponent": {
+      "startFrame": 0,
+      "frameCount": 5,
+      "frameDuration": 0.12,
+      "loop": true,
+      "frameWidth": 100,
+      "frameHeight": 100,
+      "columns": 0,
+      "rows": 0,
+      "worldWidth": 256,
+      "worldHeight": 256
+    },
+
+    "AnimationClipsComponent": {
+      "Idle": {
+        "start": 0,
+        "count": 6,
+        "duration": 0.12,
+        "loop": true
+      },
+      "Walk": {
+        "start": 8,
+        "count": 8,
+        "duration": 0.12,
+        "loop": true
+      },
+      "AttackHorizontal": {
+        "start": 16,
+        "count": 6,
+        "duration": 0.12,
+        "loop": false
+      },
+      "AttackVertical": {
+        "start": 24,
+        "count": 6,
+        "duration": 0.12,
+        "loop": false
+      },
+      "Hurt": {
+        "start": 32,
+        "count": 4,
+        "duration": 0.12,
+        "loop": false
+      },
+      "Death": {
+        "start": 40,
+        "count": 4,
+        "duration": 0.12,
+        "loop": false
+      }
+    },
+
+    "StatsComponent": {
+      "maxHitpoints": 100,
+      "currentHitpoints": 100,
+      "maxMana": 50,
+      "currentMana": 50,
+      "accuracy": 10,
+      "strength": 20,
+      "attackType": 2,
+      "defenseStab": 5,
+      "defenseSlash": 5,
+      "defenseCrush": 5,
+      "defenseMagic": 5,
+      "defenseRanged": 5,
+      "attackRange": 1.0,
+      "attackSpeed": 5
+    },
+
+    "FactionComponent": {
+      "alignment": "bad",
+      "faction": "orc clan",
+      "hostileToPlayer": true,
+      "hostileToGood": true,
+      "hostileToNeutral": true,
+      "hostileToBad": false,
+      "hostileToFactions": "city guard"
+    }
+  }
+}

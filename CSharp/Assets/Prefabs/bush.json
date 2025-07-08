@@ -1,0 +1,28 @@
+﻿{
+  "name": "bush",
+  "components": {
+    "PrefabIdComponent": {
+      "prefabId": 5,
+      "prefabName": "bush"
+    },
+    "TagComponent": { "tag": "scenery" },
+
+    "GridPositionComponent": { "tile": [ 0, 0 ] },
+    "TransformComponent": {
+      "localPosition": [ 0, 0 ],
+      "localRotation": 0,
+      "localScale": [ 1, 1 ]
+    },
+
+    "SpriteComponent": {
+      "atlasName": "environment",
+      "frameName": "bush_1"
+    },
+
+    "ObstacleComponent": {
+      "blocksMovement": true,
+      "blocksVision": true,
+      "zOrder": 1
+    }
+  }
+}

@@ -1,0 +1,384 @@
+﻿<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:vm="using:SceneEditor.ViewModels"
+             xmlns:editors="using:SceneEditor.ViewModels.ComponentEditors"
+             xmlns:converters="using:SceneEditor.Converters"
+             mc:Ignorable="d"
+             d:DesignWidth="320" d:DesignHeight="600"
+             x:Class="SceneEditor.Views.Panels.InspectorPanel"
+             x:DataType="vm:InspectorViewModel">
+
+	<UserControl.Resources>
+		<ResourceDictionary>
+			<!-- Component Editor Templates -->
+
+			<!-- Transform Component Editor -->
+			<DataTemplate DataType="editors:TransformComponentEditor" x:Key="TransformComponentTemplate">
+				<Expander IsExpanded="{Binding IsExpanded}" Header="{Binding DisplayName}" Classes="ComponentExpander">
+					<Expander.HeaderTemplate>
+						<DataTemplate>
+							<Grid ColumnDefinitions="Auto,*,Auto,Auto">
+								<TextBlock Grid.Column="0" Text="🔧" FontSize="14" Margin="0,0,8,0" VerticalAlignment="Center" />
+								<TextBlock Grid.Column="1" Text="{Binding}" FontWeight="SemiBold" VerticalAlignment="Center" />
+								<Button Grid.Column="2" Classes="Icon" ToolTip.Tip="Help" Margin="4,0">
+									<TextBlock Text="?" FontSize="11" FontWeight="Bold" />
+								</Button>
+								<CheckBox Grid.Column="3" IsChecked="{Binding $parent[Expander].DataContext.IsEnabled}"
+										  ToolTip.Tip="Enable/Disable Component" Margin="4,0,0,0" />
+							</Grid>
+						</DataTemplate>
+					</Expander.HeaderTemplate>
+
+					<StackPanel Spacing="12" Margin="0,8,0,0">
+						<!-- Position Section -->
+						<Border Classes="PropertySection">
+							<StackPanel Spacing="6">
+								<TextBlock Text="Position" Classes="PropertySectionHeader" />
+								<Grid ColumnDefinitions="20,*,8,*">
+									<TextBlock Grid.Column="0" Text="X" VerticalAlignment="Center" FontSize="11" />
+									<NumericUpDown Grid.Column="1" Value="{Binding PositionX}" FormatString="F2"
+												   Increment="0.1" Classes="PropertyField" />
+									<TextBlock Grid.Column="2" Text="Y" VerticalAlignment="Center" FontSize="11" HorizontalAlignment="Center" />
+									<NumericUpDown Grid.Column="3" Value="{Binding PositionY}" FormatString="F2"
+												   Increment="0.1" Classes="PropertyField" />
+								</Grid>
+							</StackPanel>
+						</Border>
+
+						<!-- Rotation Section -->
+						<Border Classes="PropertySection">
+							<StackPanel Spacing="6">
+								<TextBlock Text="Rotation" Classes="PropertySectionHeader" />
+								<Grid ColumnDefinitions="20,*,Auto">
+									<TextBlock Grid.Column="0" Text="°" VerticalAlignment="Center" FontSize="11" />
+									<NumericUpDown Grid.Column="1" Value="{Binding RotationDegrees}" FormatString="F1"
+												   Increment="1" Minimum="-360" Maximum="360" Classes="PropertyField" />
+									<Button Grid.Column="2" Classes="PropertyButton" ToolTip.Tip="Reset Rotation"
+											Command="{Binding ResetRotationCommand}">
+										<TextBlock Text="⟲" FontSize="12"/>
+									</Button>
+								</Grid>
+							</StackPanel>
+						</Border>
+
+						<!-- Scale Section -->
+						<Border Classes="PropertySection">
+							<StackPanel Spacing="6">
+								<DockPanel>
+									<TextBlock DockPanel.Dock="Left" Text="Scale" Classes="PropertySectionHeader" />
+									<ToggleButton DockPanel.Dock="Right" Classes="LinkButton"
+												  IsChecked="{Binding UniformScale}" ToolTip.Tip="Lock Aspect Ratio">
+										<TextBlock Text="🔗" FontSize="10" />
+									</ToggleButton>
+								</DockPanel>
+								<Grid ColumnDefinitions="20,*,8,*">
+									<TextBlock Grid.Column="0" Text="X" VerticalAlignment="Center" FontSize="11" />
+									<NumericUpDown Grid.Column="1" Value="{Binding ScaleX}" FormatString="F2"
+												   Increment="0.1" Minimum="0.01" Classes="PropertyField" />
+									<TextBlock Grid.Column="2" Text="Y" VerticalAlignment="Center" FontSize="11" HorizontalAlignment="Center" />
+									<NumericUpDown Grid.Column="3" Value="{Binding ScaleY}" FormatString="F2"
+												   Increment="0.1" Minimum="0.01" Classes="PropertyField" />
+								</Grid>
+							</StackPanel>
+						</Border>
+					</StackPanel>
+				</Expander>
+			</DataTemplate>
+
+			<!-- Sprite Component Editor -->
+			<DataTemplate DataType="editors:SpriteComponentEditor" x:Key="SpriteComponentTemplate">
+				<Expander IsExpanded="{Binding IsExpanded}" Header="{Binding DisplayName}" Classes="ComponentExpander">
+					<Expander.HeaderTemplate>
+						<DataTemplate>
+							<Grid ColumnDefinitions="Auto,*,Auto,Auto">
+								<TextBlock Grid.Column="0" Text="🖼" FontSize="14" Margin="0,0,8,0" VerticalAlignment="Center" />
+								<TextBlock Grid.Column="1" Text="{Binding}" FontWeight="SemiBold" VerticalAlignment="Center" />
+								<Button Grid.Column="2" Classes="Icon" ToolTip.Tip="Help" Margin="4,0">
+									<TextBlock Text="?" FontSize="11" FontWeight="Bold" />
+								</Button>
+								<CheckBox Grid.Column="3" IsChecked="{Binding $parent[Expander].DataContext.IsEnabled}" Margin="4,0,0,0" />
+							</Grid>
+						</DataTemplate>
+					</Expander.HeaderTemplate>
+
+					<StackPanel Spacing="8" Margin="0,8,0,0">
+						<!-- Sprite Texture -->
+						<Border Classes="PropertySection">
+							<StackPanel Spacing="6">
+								<TextBlock Text="Texture" Classes="PropertySectionHeader" />
+								<DockPanel>
+									<TextBlock DockPanel.Dock="Left" Text="Atlas:" Width="60" VerticalAlignment="Center" FontSize="11" />
+									<Button DockPanel.Dock="Right" Classes="PropertyButton" ToolTip.Tip="Browse Atlas">
+										<TextBlock Text="📁" FontSize="10"/>
+									</Button>
+									<ComboBox SelectedItem="{Binding AtlasName}" Classes="PropertyField">
+										<ComboBoxItem Content="default" />
+										<ComboBoxItem Content="characters" />
+										<ComboBoxItem Content="environment" />
+										<ComboBoxItem Content="ui" />
+									</ComboBox>
+								</DockPanel>
+								<DockPanel>
+									<TextBlock DockPanel.Dock="Left" Text="Frame:" Width="60" VerticalAlignment="Center" FontSize="11" />
+									<Button DockPanel.Dock="Right" Classes="PropertyButton" ToolTip.Tip="Preview Frame">
+										<TextBlock Text="👁" FontSize="10"/>
+									</Button>
+									<ComboBox SelectedItem="{Binding FrameName}" Classes="PropertyField">
+										<ComboBoxItem Content="white_square" />
+										<ComboBoxItem Content="player_idle" />
+										<ComboBoxItem Content="player_walk" />
+									</ComboBox>
+								</DockPanel>
+							</StackPanel>
+						</Border>
+					</StackPanel>
+				</Expander>
+			</DataTemplate>
+
+			<!-- Generic Component Editor -->
+			<DataTemplate DataType="editors:GenericComponentEditor" x:Key="GenericComponentTemplate">
+				<Expander IsExpanded="{Binding IsExpanded}" Header="{Binding DisplayName}" Classes="ComponentExpander">
+					<Expander.HeaderTemplate>
+						<DataTemplate>
+							<Grid ColumnDefinitions="Auto,*,Auto,Auto">
+								<TextBlock Grid.Column="0" Text="⚙" FontSize="14" Margin="0,0,8,0" VerticalAlignment="Center" />
+								<TextBlock Grid.Column="1" Text="{Binding}" FontWeight="SemiBold" VerticalAlignment="Center" />
+								<Button Grid.Column="2" Classes="Icon" ToolTip.Tip="Help" Margin="4,0">
+									<TextBlock Text="?" FontSize="11" FontWeight="Bold" />
+								</Button>
+								<CheckBox Grid.Column="3" IsChecked="{Binding $parent[Expander].DataContext.IsEnabled}" Margin="4,0,0,0" />
+							</Grid>
+						</DataTemplate>
+					</Expander.HeaderTemplate>
+
+					<Border Classes="PropertySection" Margin="0,8,0,0">
+						<StackPanel Spacing="6">
+							<DockPanel>
+								<TextBlock DockPanel.Dock="Left" Text="JSON Data" Classes="PropertySectionHeader" />
+								<StackPanel DockPanel.Dock="Right" Orientation="Horizontal" Spacing="4">
+									<Button Classes="PropertyButton" ToolTip.Tip="Copy JSON">
+										<TextBlock Text="📋" FontSize="10"/>
+									</Button>
+									<Button Classes="PropertyButton" ToolTip.Tip="Paste JSON">
+										<TextBlock Text="📝" FontSize="10"/>
+									</Button>
+									<Button Classes="PropertyButton" ToolTip.Tip="Reset">
+										<TextBlock Text="🔄" FontSize="10"/>
+									</Button>
+								</StackPanel>
+							</DockPanel>
+							<TextBox Text="{Binding JsonText}" AcceptsReturn="True" TextWrapping="Wrap"
+									 MinHeight="100" MaxHeight="300" Classes="Code"
+									 ScrollViewer.VerticalScrollBarVisibility="Auto" />
+						</StackPanel>
+					</Border>
+				</Expander>
+			</DataTemplate>
+		</ResourceDictionary>
+	</UserControl.Resources>
+
+	<UserControl.Styles>
+		<!-- Inspector Panel Styles -->
+		<Style Selector="Expander.ComponentExpander">
+			<Setter Property="Margin" Value="0,2" />
+			<Setter Property="Background" Value="{DynamicResource PanelBackgroundBrush}" />
+			<Setter Property="BorderBrush" Value="{DynamicResource BorderBrush}" />
+			<Setter Property="BorderThickness" Value="1" />
+			<Setter Property="CornerRadius" Value="6" />
+			<Setter Property="Padding" Value="8" />
+		</Style>
+
+		<Style Selector="Border.PropertySection">
+			<Setter Property="Background" Value="{DynamicResource SurfaceBackgroundBrush}" />
+			<Setter Property="BorderBrush" Value="{DynamicResource BorderBrush}" />
+			<Setter Property="BorderThickness" Value="1" />
+			<Setter Property="CornerRadius" Value="4" />
+			<Setter Property="Padding" Value="8,6" />
+		</Style>
+
+		<Style Selector="TextBlock.PropertySectionHeader">
+			<Setter Property="FontWeight" Value="Medium" />
+			<Setter Property="FontSize" Value="12" />
+			<Setter Property="Foreground" Value="{DynamicResource PrimaryTextBrush}" />
+		</Style>
+
+		<Style Selector="NumericUpDown.PropertyField">
+			<Setter Property="Height" Value="28" />
+			<Setter Property="FontSize" Value="12" />
+			<Setter Property="Background" Value="{DynamicResource SurfaceBackgroundBrush}" />
+			<Setter Property="BorderBrush" Value="{DynamicResource BorderBrush}" />
+			<Setter Property="Foreground" Value="{DynamicResource PrimaryTextBrush}" />
+		</Style>
+
+		<Style Selector="TextBox.PropertyField">
+			<Setter Property="Height" Value="28" />
+			<Setter Property="FontSize" Value="12" />
+			<Setter Property="Background" Value="{DynamicResource SurfaceBackgroundBrush}" />
+			<Setter Property="BorderBrush" Value="{DynamicResource BorderBrush}" />
+			<Setter Property="Foreground" Value="{DynamicResource PrimaryTextBrush}" />
+		</Style>
+
+		<Style Selector="ComboBox.PropertyField">
+			<Setter Property="Height" Value="28" />
+			<Setter Property="FontSize" Value="12" />
+			<Setter Property="Background" Value="{DynamicResource SurfaceBackgroundBrush}" />
+			<Setter Property="BorderBrush" Value="{DynamicResource BorderBrush}" />
+			<Setter Property="Foreground" Value="{DynamicResource PrimaryTextBrush}" />
+		</Style>
+
+		<Style Selector="Button.PropertyButton">
+			<Setter Property="Background" Value="Transparent" />
+			<Setter Property="BorderBrush" Value="{DynamicResource BorderBrush}" />
+			<Setter Property="BorderThickness" Value="1" />
+			<Setter Property="CornerRadius" Value="4" />
+			<Setter Property="FontSize" Value="10" />
+			<Setter Property="Width" Value="24" />
+			<Setter Property="Height" Value="24" />
+			<Setter Property="Padding" Value="2" />
+		</Style>
+
+		<Style Selector="Button.PropertyButton:pointerover">
+			<Setter Property="Background" Value="{DynamicResource HoverBackgroundBrush}" />
+		</Style>
+
+		<Style Selector="ToggleButton.LinkButton">
+			<Setter Property="Background" Value="Transparent" />
+			<Setter Property="BorderThickness" Value="0" />
+			<Setter Property="FontSize" Value="10" />
+			<Setter Property="Width" Value="20" />
+			<Setter Property="Height" Value="20" />
+		</Style>
+
+		<Style Selector="ToggleButton.LinkButton:checked">
+			<Setter Property="Foreground" Value="{DynamicResource AccentTextBrush}" />
+		</Style>
+	</UserControl.Styles>
+
+	<Border Classes="Panel">
+		<DockPanel>
+			<!-- Header -->
+			<Border DockPanel.Dock="Top" Classes="Header">
+				<Grid ColumnDefinitions="*,Auto">
+					<TextBlock Grid.Column="0" Text="Inspector" Classes="PanelHeader" />
+
+					<!-- Inspector Tools -->
+					<StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="4">
+						<!-- Lock Inspector -->
+						<ToggleButton Classes="Icon" ToolTip.Tip="Lock Inspector" IsChecked="{Binding IsLocked}">
+							<TextBlock Text="🔒" FontSize="11" />
+						</ToggleButton>
+
+						<!-- Inspector Options -->
+						<Button Classes="Icon" ToolTip.Tip="Inspector Options">
+							<Button.Flyout>
+								<MenuFlyout>
+									<MenuItem Header="Show All Components" />
+									<MenuItem Header="Show Hidden Components" />
+									<MenuItem Header="Show Component Icons" />
+									<Separator />
+									<MenuItem Header="Compact Mode" />
+									<MenuItem Header="Expert Mode" />
+									<Separator />
+									<MenuItem Header="Reset Layout" />
+								</MenuFlyout>
+							</Button.Flyout>
+							<TextBlock Text="⚙" FontSize="11" />
+						</Button>
+
+						<!-- Add Component -->
+						<Button Classes="Icon" Command="{Binding AddComponentCommand}" ToolTip.Tip="Add Component"
+								IsVisible="{Binding HasSelection}">
+							<TextBlock Text="+" FontWeight="Bold" FontSize="14" />
+						</Button>
+					</StackPanel>
+				</Grid>
+			</Border>
+
+			<!-- No Selection State -->
+			<Border IsVisible="{Binding !HasSelection}" Classes="Card" Margin="12">
+				<Border Padding="24">
+					<StackPanel HorizontalAlignment="Center" VerticalAlignment="Center" Spacing="16">
+						<TextBlock Text="🔍" FontSize="48" HorizontalAlignment="Center" Opacity="0.5" />
+						<StackPanel Spacing="8" HorizontalAlignment="Center">
+							<TextBlock Text="No entity selected" FontSize="16" FontWeight="Medium"
+									   HorizontalAlignment="Center" Foreground="{DynamicResource SecondaryTextBrush}" />
+							<TextBlock Text="Select an entity in the hierarchy or scene view to inspect its components"
+									   HorizontalAlignment="Center" TextWrapping="Wrap" TextAlignment="Center"
+									   MaxWidth="220" Foreground="{DynamicResource SecondaryTextBrush}" FontSize="12" />
+						</StackPanel>
+					</StackPanel>
+				</Border>
+			</Border>
+
+			<!-- Entity Inspector -->
+			<ScrollViewer IsVisible="{Binding HasSelection}" VerticalScrollBarVisibility="Auto"
+						  HorizontalScrollBarVisibility="Disabled">
+				<StackPanel Spacing="8" Margin="8">
+					<!-- Entity Header -->
+					<Border Classes="Card" Padding="12">
+						<Grid ColumnDefinitions="Auto,*,Auto" RowDefinitions="Auto,Auto">
+							<!-- Entity Icon -->
+							<Border Grid.Row="0" Grid.Column="0" Grid.RowSpan="2"
+									Width="32" Height="32" CornerRadius="16"
+									Background="{DynamicResource SelectionBackgroundBrush}" Margin="0,0,12,0">
+								<TextBlock Text="🎯" FontSize="16" HorizontalAlignment="Center" VerticalAlignment="Center"
+										   Foreground="{DynamicResource SelectionTextBrush}" />
+							</Border>
+
+							<!-- Entity Name -->
+							<TextBox Grid.Row="0" Grid.Column="1" Text="{Binding EntityName}"
+									 FontWeight="SemiBold" FontSize="14" Background="Transparent"
+									 BorderThickness="0,0,0,1" BorderBrush="{DynamicResource BorderBrush}" Padding="4,2" />
+
+							<!-- Entity Active Toggle -->
+							<CheckBox Grid.Row="0" Grid.Column="2" Content="Active" IsChecked="{Binding IsEntityActive}"
+									  FontSize="12" Margin="8,0,0,0" />
+
+							<!-- Entity Info -->
+							<StackPanel Grid.Row="1" Grid.Column="1" Grid.ColumnSpan="2"
+										Orientation="Horizontal" Spacing="12" Margin="0,4,0,0">
+								<TextBlock Text="{Binding EntityId, StringFormat='ID: {0}'}" FontSize="10"
+										   Foreground="{DynamicResource SecondaryTextBrush}" />
+								<TextBlock Text="{Binding ComponentCount, StringFormat='{}{0} Components'}" FontSize="10"
+										   Foreground="{DynamicResource SecondaryTextBrush}" />
+								<TextBlock Text="{Binding EntityType}" FontSize="10"
+										   Foreground="{DynamicResource SecondaryTextBrush}" />
+							</StackPanel>
+						</Grid>
+					</Border>
+
+					<!-- Component Editors -->
+					<ItemsControl ItemsSource="{Binding ComponentEditors}">
+						<ItemsControl.ItemsPanel>
+							<ItemsPanelTemplate>
+								<StackPanel Spacing="4" />
+							</ItemsPanelTemplate>
+						</ItemsControl.ItemsPanel>
+					</ItemsControl>
+
+					<!-- Add Component Section -->
+					<Border Classes="Card" Padding="16" Margin="0,8,0,0">
+						<Button Content="Add Component" Command="{Binding AddComponentCommand}"
+								HorizontalAlignment="Center" Classes="Secondary" Padding="16,8" FontSize="12">
+							<Button.Template>
+								<ControlTemplate>
+									<Border Background="{TemplateBinding Background}"
+											BorderBrush="{TemplateBinding BorderBrush}"
+											BorderThickness="{TemplateBinding BorderThickness}"
+											CornerRadius="6" Padding="{TemplateBinding Padding}">
+										<StackPanel Orientation="Horizontal" Spacing="8" HorizontalAlignment="Center">
+											<TextBlock Text="+" FontWeight="Bold" FontSize="16" VerticalAlignment="Center"/>
+											<ContentPresenter VerticalAlignment="Center"/>
+										</StackPanel>
+									</Border>
+								</ControlTemplate>
+							</Button.Template>
+						</Button>
+					</Border>
+				</StackPanel>
+			</ScrollViewer>
+		</DockPanel>
+	</Border>
+</UserControl>

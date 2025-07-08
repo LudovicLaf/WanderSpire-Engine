@@ -1,0 +1,94 @@
+﻿{
+  "name": "player",
+
+  "components": {
+    "PrefabIdComponent": {
+      "prefabId": 1,
+      "prefabName": "player"
+    },
+    "PlayerTagComponent": {},
+    "GridPositionComponent": { "tile": [ 0, 0 ] },
+
+    "MovementComponent": {},
+    "PathFollowingComponent": {},
+
+    "FacingComponent": { "facing": 0 },
+    "AnimationStateComponent": { "state": 0 },
+
+    "SpriteComponent": {
+      "atlasName": "player",
+      "frameName": "bob_idle_0"
+    },
+    "SpriteAnimationComponent": {
+      "startFrame": 0,
+      "frameCount": 1,
+      "frameDuration": 0.12,
+      "loop": true,
+      "frameWidth": 64,
+      "frameHeight": 64,
+      "columns": 0,
+      "rows": 0,
+      "worldWidth": 64,
+      "worldHeight": 64
+    },
+
+    "AnimationClipsComponent": {
+      "Idle": {
+        "startFrame": 0,
+        "frameCount": 0,
+        "frameDuration": 0.12,
+        "loop": true
+      },
+      "Walk": {
+        "startFrame": 0,
+        "frameCount": 0,
+        "frameDuration": 0.12,
+        "loop": true
+      },
+      "AttackHorizontal": {
+        "startFrame": 0,
+        "frameCount": 0,
+        "frameDuration": 0.12,
+        "loop": false
+      },
+      "AttackVertical": {
+        "startFrame": 0,
+        "frameCount": 0,
+        "frameDuration": 0.12,
+        "loop": false
+      },
+      "Hurt": {
+        "startFrame": 0,
+        "frameCount": 0,
+        "frameDuration": 0.12,
+        "loop": false
+      },
+      "Death": {
+        "startFrame": 0,
+        "frameCount": 0,
+        "frameDuration": 0.12,
+        "loop": false
+      }
+    },
+    "StatsComponent": {
+      "maxHitpoints": 100,
+      "currentHitpoints": 100,
+      "maxMana": 100,
+      "currentMana": 100,
+      "accuracy": 10,
+      "strength": 10,
+      "attackType": 2,
+      "defenseStab": 5,
+      "defenseSlash": 5,
+      "defenseCrush": 5,
+      "defenseMagic": 5,
+      "defenseRanged": 5,
+      "attackRange": 1.0,
+      "attackSpeed": 5
+    },
+
+    "ScriptsComponent": {
+      "scripts": [ "Game.Behaviours.PlayerController" ]
+    }
+  }
+}

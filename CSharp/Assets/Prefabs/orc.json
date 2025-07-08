@@ -1,0 +1,113 @@
+﻿{
+  "name": "orc",
+
+  "components": {
+    "PrefabIdComponent": {
+      "prefabId": 123,
+      "prefabName": "orc"
+    },
+    "GridPositionComponent": { "tile": [ 0, 0 ] },
+
+    "MovementComponent": {},
+    "PathFollowingComponent": {},
+
+    "FacingComponent": { "facing": 0 },
+    "AnimationStateComponent": { "state": 0 },
+
+    "SpriteComponent": {
+      "atlasName": "Mobs/small_orc.png",
+      "frameName": ""
+    },
+    "SpriteAnimationComponent": {
+      "startFrame": 0,
+      "frameCount": 5,
+      "frameDuration": 0.12,
+      "loop": true,
+      "frameWidth": 100,
+      "frameHeight": 100,
+      "columns": 0,
+      "rows": 0,
+      "worldWidth": 256,
+      "worldHeight": 256
+    },
+
+    "AnimationClipsComponent": {
+      "Idle": {
+        "start": 0,
+        "count": 6,
+        "duration": 0.12,
+        "loop": true
+      },
+      "Walk": {
+        "start": 8,
+        "count": 8,
+        "duration": 0.12,
+        "loop": true
+      },
+      "AttackHorizontal": {
+        "start": 16,
+        "count": 6,
+        "duration": 0.12,
+        "loop": false
+      },
+      "AttackVertical": {
+        "start": 24,
+        "count": 6,
+        "duration": 0.12,
+        "loop": false
+      },
+      "Hurt": {
+        "start": 32,
+        "count": 4,
+        "duration": 0.12,
+        "loop": false
+      },
+      "Death": {
+        "start": 40,
+        "count": 4,
+        "duration": 0.12,
+        "loop": false
+      }
+    },
+    "StatsComponent": {
+      "maxHitpoints": 150,
+      "currentHitpoints": 150,
+      "maxMana": 0,
+      "currentMana": 0,
+      "accuracy": 10,
+      "strength": 20,
+      "attackType": 2,
+      "defenseStab": 5,
+      "defenseSlash": 5,
+      "defenseCrush": 5,
+      "defenseMagic": 5,
+      "defenseRanged": 5,
+      "attackRange": 1.0,
+      "attackSpeed": 5
+    },
+
+    "FactionComponent": {
+      "alignment": "bad",
+      "faction": "orc_clan",
+      "hostileToPlayer": true,
+      "hostileToGood": true,
+      "hostileToNeutral": true,
+      "hostileToBad": false,
+      "hostileToFactions": "city_guard"
+    },
+
+    "AIParams": {
+      "wanderRadius": 2.0,
+      "wanderChance": 0.2,
+      "awarenessRange": 6,
+      "chaseRange": 12,
+      "state": 0,
+      "position": [ 0, 0 ],
+      "origin": [ 0, 0 ]
+    },
+
+    "ScriptsComponent": {
+      "scripts": [ "Game.Behaviours.AIBehaviour" ]
+    }
+  }
+}

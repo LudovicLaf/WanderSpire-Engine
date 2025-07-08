@@ -1,0 +1,57 @@
+﻿{
+	"initial": "Idle",
+
+	"states": {
+		"Idle": {
+			"transitions": [
+				{
+					"event": "rnd-wander",
+					"to": "Wander"
+				},
+				{
+					"event": "see-enemy",
+					"to": "Chase"
+				}
+			]
+		},
+
+		"Wander": {
+			"transitions": [
+				{
+					"event": "wander-done",
+					"to": "Idle"
+				},
+				{
+					"event": "see-enemy",
+					"to": "Chase"
+				}
+			]
+		},
+
+		"Chase": {
+			"transitions": [
+				{
+					"event": "lost-enemy",
+					"to": "Idle"
+				},
+				{
+					"event": "in-range",
+					"to": "Attack"
+				}
+			]
+		},
+
+		"Attack": {
+			"transitions": [
+				{
+					"event": "enemy-dead",
+					"to": "Idle"
+				},
+				{
+					"event": "out-of-range",
+					"to": "Chase"
+				}
+			]
+		}
+	}
+}

@@ -1,0 +1,10 @@
+﻿#pragma once
+#include "WanderSpire/Editor/TilePaint/TilePalette.h"
+#include "WanderSpire/Editor/TilePaint/TileBrush.h"
+#include "WanderSpire/Editor/TilePaint/AutoTiling.h"
+#include "WanderSpire/Editor/TilePaint/TilePaintingManager.h"
+#include "WanderSpire/Editor/TilePaint/TileLayerManager.h"
+#include "WanderSpire/Components/TilePaletteComponent.h"
+#include "WanderSpire/Components/TileBrushComponent.h"
+#include "WanderSpire/Components/AutoTilingComponent.h"
+#include "WanderSpire/Components/AnimatedTileComponent.h"

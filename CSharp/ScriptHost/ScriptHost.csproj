@@ -1,0 +1,26 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+	<PropertyGroup>
+		<TargetFramework>net8.0</TargetFramework>
+		<LangVersion>preview</LangVersion>
+		<!-- ← allow function-pointers -->
+		<Nullable>enable</Nullable>
+		<AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+		<GenerateAssemblyInfo>false</GenerateAssemblyInfo>
+		<ProduceReferenceAssembly>true</ProduceReferenceAssembly>
+	</PropertyGroup>
+	<ItemGroup>
+		<!-- P/Invoke layer -->
+		<!-- Roslyn scripting -->
+		<PackageReference Include="Microsoft.CodeAnalysis.CSharp.Scripting" Version="4.8.0" />
+		<PackageReference Include="Microsoft.CodeAnalysis.Scripting" Version="4.8.0" />
+		<PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
+	</ItemGroup>
+	<ItemGroup>
+		<!-- hot-reload .csx under Assets/Scripts -->
+		<Content Include="..\..\Assets\Scripts\**\*.csx" CopyToOutputDirectory="PreserveNewest" />
+		<!-- hot-reloadable quest & encounter scripts -->
+		<Content Include="..\..\Assets\Content\Quests\**\*.csx" CopyToOutputDirectory="PreserveNewest" />
+		<Content Include="..\..\Assets\Content\Encounters\**\*.csx" CopyToOutputDirectory="PreserveNewest" />
+	</ItemGroup>
+
+</Project>

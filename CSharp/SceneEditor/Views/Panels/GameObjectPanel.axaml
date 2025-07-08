@@ -1,0 +1,488 @@
+﻿<UserControl
+    x:Class="SceneEditor.Views.Panels.GameObjectPanel"
+    xmlns="https://github.com/avaloniaui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:vm="clr-namespace:SceneEditor.ViewModels"
+    xmlns:models="clr-namespace:SceneEditor.Models"
+    xmlns:converters="clr-namespace:SceneEditor.Converters"
+    x:DataType="vm:GameObjectViewModel">
+
+	<UserControl.Resources>
+		<converters:BoolToVisibilityConverter x:Key="BoolToVisibility"/>
+		<converters:InverseBoolToVisibilityConverter x:Key="InverseBoolToVisibility"/>
+	</UserControl.Resources>
+
+	<Grid RowDefinitions="Auto,*,Auto">
+
+		<!-- Modern Header with mode toggle and search -->
+		<Border Grid.Row="0" Classes="Header">
+			<Grid ColumnDefinitions="Auto,*,Auto">
+
+				<!-- Mode Toggle Buttons -->
+				<StackPanel Grid.Column="0" Orientation="Horizontal" Spacing="2">
+					<RadioButton Content="Scene" IsChecked="{Binding IsSceneMode}"
+								 Command="{Binding SwitchToSceneModeCommand}"
+								 Classes="Tool" ToolTip.Tip="Edit GameObjects in the scene"
+								 MinWidth="60" Padding="8,6">
+						<RadioButton.Template>
+							<ControlTemplate>
+								<Border Background="{TemplateBinding Background}"
+										BorderBrush="{TemplateBinding BorderBrush}"
+										BorderThickness="{TemplateBinding BorderThickness}"
+										CornerRadius="4,0,0,4"
+										Padding="{TemplateBinding Padding}">
+									<ContentPresenter Content="{TemplateBinding Content}"
+													  HorizontalAlignment="Center"
+													  VerticalAlignment="Center"/>
+								</Border>
+							</ControlTemplate>
+						</RadioButton.Template>
+					</RadioButton>
+					<RadioButton Content="Prefabs" IsChecked="{Binding IsPrefabMode}"
+								 Command="{Binding SwitchToPrefabModeCommand}"
+								 Classes="Tool" ToolTip.Tip="Manage prefab definitions"
+								 MinWidth="60" Padding="8,6">
+						<RadioButton.Template>
+							<ControlTemplate>
+								<Border Background="{TemplateBinding Background}"
+										BorderBrush="{TemplateBinding BorderBrush}"
+										BorderThickness="{TemplateBinding BorderThickness}"
+										CornerRadius="0,4,4,0"
+										Padding="{TemplateBinding Padding}">
+									<ContentPresenter Content="{TemplateBinding Content}"
+													  HorizontalAlignment="Center"
+													  VerticalAlignment="Center"/>
+								</Border>
+							</ControlTemplate>
+						</RadioButton.Template>
+					</RadioButton>
+				</StackPanel>
+
+				<!-- Search Box -->
+				<TextBox Grid.Column="1" Text="{Binding SearchText}"
+						 Watermark="Search GameObjects or Prefabs..."
+						 Classes="Search" Margin="12,0"/>
+
+				<!-- Action Buttons -->
+				<StackPanel Grid.Column="2" Orientation="Horizontal" Spacing="4">
+					<Button Classes="Primary Icon"
+							IsVisible="{Binding IsSceneMode, Converter={StaticResource BoolToVisibility}}"
+							ToolTip.Tip="Create GameObject">
+						<Button.Flyout>
+							<MenuFlyout>
+								<MenuItem Header="Empty GameObject" Command="{Binding CreateGameObjectCommand}">
+									<MenuItem.Icon>
+										<TextBlock Text="🎯" FontSize="12"/>
+									</MenuItem.Icon>
+								</MenuItem>
+								<Separator/>
+								<MenuItem Header="From Prefab..." ItemsSource="{Binding PrefabLibrary}">
+									<MenuItem.Icon>
+										<TextBlock Text="📦" FontSize="12"/>
+									</MenuItem.Icon>
+									<MenuItem.ItemTemplate>
+										<DataTemplate DataType="models:PrefabDefinition">
+											<MenuItem Header="{Binding Name}"
+													  Command="{Binding $parent[UserControl].((vm:GameObjectViewModel)DataContext).InstantiatePrefabCommand}"
+													  CommandParameter="{Binding Name}"/>
+										</DataTemplate>
+									</MenuItem.ItemTemplate>
+								</MenuItem>
+							</MenuFlyout>
+						</Button.Flyout>
+						<TextBlock Text="+" FontWeight="Bold" FontSize="16"/>
+					</Button>
+
+					<Button Classes="Primary Icon" Command="{Binding CreateNewPrefabCommand}"
+							IsVisible="{Binding IsPrefabMode, Converter={StaticResource BoolToVisibility}}"
+							ToolTip.Tip="Create new prefab">
+						<TextBlock Text="+" FontWeight="Bold" FontSize="16"/>
+					</Button>
+
+					<Button Classes="Icon" Command="{Binding RefreshCommand}" ToolTip.Tip="Refresh">
+						<TextBlock Text="🔄" FontSize="12"/>
+					</Button>
+				</StackPanel>
+			</Grid>
+		</Border>
+
+		<!-- Main Content -->
+		<Grid Grid.Row="1">
+
+			<!-- Scene Mode Content -->
+			<Grid IsVisible="{Binding IsSceneMode, Converter={StaticResource BoolToVisibility}}"
+				  RowDefinitions="*,Auto,*">
+
+				<!-- Scene Hierarchy Tree -->
+				<Border Grid.Row="0" Background="{DynamicResource PanelBackgroundBrush}"
+						BorderBrush="{DynamicResource DividerBrush}" BorderThickness="0,0,0,1">
+					<DockPanel>
+						<Border DockPanel.Dock="Top" Classes="Header" Padding="12,8">
+							<TextBlock Text="Scene Hierarchy" Classes="PanelHeader"/>
+						</Border>
+
+						<TreeView Name="HierarchyTree" ItemsSource="{Binding RootGameObjects}"
+								  SelectedItem="{Binding SelectedGameObject}"
+								  ScrollViewer.HorizontalScrollBarVisibility="Auto" Margin="8">
+							<TreeView.ItemTemplate>
+								<TreeDataTemplate DataType="models:SceneNode" ItemsSource="{Binding Children}">
+									<Border Padding="6,4" CornerRadius="4" Background="Transparent">
+										<Border.ContextFlyout>
+											<MenuFlyout>
+												<MenuItem Header="Duplicate" Command="{Binding $parent[UserControl].((vm:GameObjectViewModel)DataContext).DuplicateGameObjectCommand}">
+													<MenuItem.Icon>
+														<TextBlock Text="📋" FontSize="12"/>
+													</MenuItem.Icon>
+												</MenuItem>
+												<MenuItem Header="Delete" Command="{Binding $parent[UserControl].((vm:GameObjectViewModel)DataContext).DeleteGameObjectCommand}">
+													<MenuItem.Icon>
+														<TextBlock Text="🗑" FontSize="12"/>
+													</MenuItem.Icon>
+												</MenuItem>
+												<Separator/>
+												<MenuItem Header="Create Prefab" Command="{Binding $parent[UserControl].((vm:GameObjectViewModel)DataContext).CreatePrefabFromGameObjectCommand}"
+														  IsEnabled="{Binding $parent[UserControl].((vm:GameObjectViewModel)DataContext).CanCreatePrefab}">
+													<MenuItem.Icon>
+														<TextBlock Text="📦" FontSize="12"/>
+													</MenuItem.Icon>
+												</MenuItem>
+												<Separator/>
+												<MenuItem Header="Rename" Command="{Binding $parent[UserControl].((vm:GameObjectViewModel)DataContext).RenameGameObjectCommand}">
+													<MenuItem.Icon>
+														<TextBlock Text="✏" FontSize="12"/>
+													</MenuItem.Icon>
+												</MenuItem>
+												<MenuItem Header="Focus" Command="{Binding $parent[UserControl].((vm:GameObjectViewModel)DataContext).FocusGameObjectCommand}">
+													<MenuItem.Icon>
+														<TextBlock Text="🎯" FontSize="12"/>
+													</MenuItem.Icon>
+												</MenuItem>
+											</MenuFlyout>
+										</Border.ContextFlyout>
+										<Grid ColumnDefinitions="Auto,Auto,*">
+											<Border Grid.Column="0" Width="16" Height="16" Margin="0,0,6,0">
+												<TextBlock Text="🎯" FontSize="10" HorizontalAlignment="Center" VerticalAlignment="Center"
+														   Foreground="{DynamicResource AccentTextBrush}"/>
+											</Border>
+											<StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="4" Margin="0,0,6,0">
+												<TextBlock Text="👁" FontSize="10" IsVisible="{Binding IsVisible}"
+														   Foreground="{DynamicResource SuccessColor}"/>
+												<TextBlock Text="🔒" FontSize="10" IsVisible="{Binding IsLocked}"
+														   Foreground="{DynamicResource WarningColor}"/>
+											</StackPanel>
+											<TextBlock Grid.Column="2" Text="{Binding Name}" VerticalAlignment="Center"
+													   Foreground="{DynamicResource PrimaryTextBrush}"/>
+										</Grid>
+									</Border>
+								</TreeDataTemplate>
+							</TreeView.ItemTemplate>
+						</TreeView>
+					</DockPanel>
+				</Border>
+
+				<GridSplitter Grid.Row="1" Height="4" Background="{DynamicResource DividerBrush}"/>
+
+				<!-- GameObject Inspector -->
+				<Border Grid.Row="2" Background="{DynamicResource PanelBackgroundBrush}">
+					<DockPanel>
+						<Border DockPanel.Dock="Top" Classes="Header" Padding="12,8">
+							<TextBlock Text="{Binding SelectedGameObject.Name, StringFormat='Inspector - {0}', FallbackValue='Inspector - No Selection'}"
+									   Classes="PanelHeader"/>
+						</Border>
+
+						<ScrollViewer IsVisible="{Binding HasSelectedGameObject, Converter={StaticResource BoolToVisibility}}"
+									  Padding="12">
+							<StackPanel Spacing="16">
+								<!-- GameObject Name -->
+								<Border Classes="Card" Padding="12">
+									<Grid ColumnDefinitions="Auto,*" RowDefinitions="Auto,Auto">
+										<TextBlock Grid.Column="0" Text="Name:" VerticalAlignment="Center"
+												   Margin="0,0,12,0" FontWeight="Medium"/>
+										<TextBox Grid.Column="1" Text="{Binding SelectedGameObject.Name}" VerticalAlignment="Center"/>
+									</Grid>
+								</Border>
+
+								<!-- Component Management -->
+								<Border Classes="Card" Padding="12">
+									<StackPanel Spacing="12">
+										<TextBlock Text="Components" FontWeight="SemiBold" FontSize="16"/>
+										<Grid ColumnDefinitions="*,Auto">
+											<ComboBox Grid.Column="0" ItemsSource="{Binding ComponentTypes}"
+													  SelectedItem="{Binding SelectedComponentType}"
+													  PlaceholderText="Select component..." Margin="0,0,8,0"/>
+											<Button Grid.Column="1" Content="Add Component"
+													Command="{Binding AddComponentCommand}"
+													IsEnabled="{Binding CanAddComponent}" Classes="Primary"/>
+										</Grid>
+										<!-- Component List Placeholder -->
+										<Border Background="{DynamicResource SurfaceBackgroundBrush}"
+												CornerRadius="4" Padding="12" MinHeight="60"
+												BorderBrush="{DynamicResource BorderBrush}" BorderThickness="1">
+											<TextBlock Text="Components will be listed here..."
+													   Foreground="{DynamicResource SecondaryTextBrush}"
+													   FontStyle="Italic" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+										</Border>
+									</StackPanel>
+								</Border>
+
+								<!-- Create Prefab -->
+								<Button Content="Create Prefab from GameObject" Command="{Binding CreatePrefabFromGameObjectCommand}"
+										IsEnabled="{Binding CanCreatePrefab}" HorizontalAlignment="Stretch" Classes="Primary"/>
+							</StackPanel>
+						</ScrollViewer>
+
+						<Border IsVisible="{Binding HasSelectedGameObject, Converter={StaticResource InverseBoolToVisibility}}" Padding="24">
+							<StackPanel HorizontalAlignment="Center" VerticalAlignment="Center" Spacing="12">
+								<TextBlock Text="🎯" FontSize="48" HorizontalAlignment="Center" Opacity="0.5"/>
+								<TextBlock Text="Select a GameObject to edit its properties" HorizontalAlignment="Center"
+										   Foreground="{DynamicResource SecondaryTextBrush}" FontStyle="Italic"/>
+							</StackPanel>
+						</Border>
+					</DockPanel>
+				</Border>
+			</Grid>
+
+			<!-- Prefab Mode Content -->
+			<Grid IsVisible="{Binding IsPrefabMode, Converter={StaticResource BoolToVisibility}}"
+				  RowDefinitions="*,Auto,*">
+
+				<!-- Prefab Library -->
+				<Border Grid.Row="0" Background="{DynamicResource PanelBackgroundBrush}"
+						BorderBrush="{DynamicResource DividerBrush}" BorderThickness="0,0,0,1">
+					<DockPanel>
+						<Border DockPanel.Dock="Top" Classes="Header" Padding="12,8">
+							<TextBlock Text="Prefab Library" Classes="PanelHeader"/>
+						</Border>
+
+						<ListBox Name="PrefabList" ItemsSource="{Binding PrefabLibrary}"
+								 SelectedItem="{Binding SelectedPrefab}" Margin="8">
+							<ListBox.ItemTemplate>
+								<DataTemplate DataType="models:PrefabDefinition">
+									<Border Background="Transparent" Padding="8" CornerRadius="4">
+										<Border.ContextFlyout>
+											<MenuFlyout>
+												<MenuItem Header="Save" Command="{Binding $parent[UserControl].((vm:GameObjectViewModel)DataContext).SavePrefabCommand}">
+													<MenuItem.Icon>
+														<TextBlock Text="💾" FontSize="12"/>
+													</MenuItem.Icon>
+												</MenuItem>
+												<MenuItem Header="Duplicate" Command="{Binding $parent[UserControl].((vm:GameObjectViewModel)DataContext).DuplicatePrefabCommand}"
+														  CommandParameter="{Binding}">
+													<MenuItem.Icon>
+														<TextBlock Text="📋" FontSize="12"/>
+													</MenuItem.Icon>
+												</MenuItem>
+												<MenuItem Header="Delete" Command="{Binding $parent[UserControl].((vm:GameObjectViewModel)DataContext).DeletePrefabCommand}"
+														  CommandParameter="{Binding}">
+													<MenuItem.Icon>
+														<TextBlock Text="🗑" FontSize="12"/>
+													</MenuItem.Icon>
+												</MenuItem>
+											</MenuFlyout>
+										</Border.ContextFlyout>
+										<Grid ColumnDefinitions="*,Auto">
+											<StackPanel Grid.Column="0" Orientation="Horizontal" Spacing="8">
+												<TextBlock Text="📦" FontSize="16" VerticalAlignment="Center"
+														   Foreground="{DynamicResource AccentTextBrush}"/>
+												<TextBlock Text="{Binding Name}" VerticalAlignment="Center" FontWeight="Medium"/>
+												<Ellipse Width="6" Height="6" Fill="{DynamicResource WarningColor}"
+														 IsVisible="{Binding IsDirty}" VerticalAlignment="Center"/>
+											</StackPanel>
+											<StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="4">
+												<Button Classes="Icon" Command="{Binding $parent[UserControl].((vm:GameObjectViewModel)DataContext).SavePrefabCommand}"
+														ToolTip.Tip="Save prefab">
+													<TextBlock Text="💾" FontSize="10"/>
+												</Button>
+												<Button Classes="Icon" Command="{Binding $parent[UserControl].((vm:GameObjectViewModel)DataContext).DuplicatePrefabCommand}"
+														CommandParameter="{Binding}" ToolTip.Tip="Duplicate prefab">
+													<TextBlock Text="📋" FontSize="10"/>
+												</Button>
+												<Button Classes="Icon" Command="{Binding $parent[UserControl].((vm:GameObjectViewModel)DataContext).DeletePrefabCommand}"
+														CommandParameter="{Binding}" ToolTip.Tip="Delete prefab">
+													<TextBlock Text="🗑" FontSize="10"/>
+												</Button>
+											</StackPanel>
+										</Grid>
+									</Border>
+								</DataTemplate>
+							</ListBox.ItemTemplate>
+						</ListBox>
+					</DockPanel>
+				</Border>
+
+				<GridSplitter Grid.Row="1" Height="4" Background="{DynamicResource DividerBrush}"/>
+
+				<!-- Prefab Editor -->
+				<Border Grid.Row="2" Background="{DynamicResource PanelBackgroundBrush}">
+					<Grid RowDefinitions="Auto,*">
+						<!-- Header -->
+						<Border Grid.Row="0" Classes="Header" Padding="12,8">
+							<Grid ColumnDefinitions="*,Auto">
+								<TextBlock Grid.Column="0" Text="{Binding SelectedPrefab.Name, StringFormat='Prefab Editor - {0}', FallbackValue='Prefab Editor'}"
+										   Classes="PanelHeader" VerticalAlignment="Center"/>
+								<Button Grid.Column="1" Content="New Prefab" Command="{Binding CreateNewPrefabCommand}"
+										Classes="Primary" IsVisible="{Binding IsPrefabMode}" Padding="8,4"/>
+							</Grid>
+						</Border>
+
+						<!-- Content Area -->
+						<Grid Grid.Row="1">
+							<!-- Selected Prefab Content -->
+							<ScrollViewer IsVisible="{Binding HasSelectedPrefab}">
+								<StackPanel Margin="12" Spacing="12">
+									<!-- Prefab Info -->
+									<Border Classes="Card" Padding="12">
+										<StackPanel Spacing="8">
+											<Grid ColumnDefinitions="Auto,*,Auto">
+												<TextBlock Grid.Column="0" Text="Name:" VerticalAlignment="Center"
+														   FontWeight="Medium" Margin="0,0,8,0"/>
+												<TextBox Grid.Column="1" Text="{Binding SelectedPrefab.Name}"
+														 VerticalAlignment="Center" Margin="0,0,8,0"/>
+												<Button Grid.Column="2" Content="Save" Command="{Binding SavePrefabCommand}"
+														Classes="Primary" Padding="12,6"/>
+											</Grid>
+											<TextBlock FontSize="11" Foreground="{DynamicResource SecondaryTextBrush}">
+												<TextBlock.Text>
+													<MultiBinding StringFormat="{}ID: {0}">
+														<Binding Path="SelectedPrefab.PrefabId"/>
+													</MultiBinding>
+												</TextBlock.Text>
+											</TextBlock>
+										</StackPanel>
+									</Border>
+
+									<!-- Add Component -->
+									<Border Classes="Card" Padding="12">
+										<StackPanel Spacing="8">
+											<TextBlock Text="Add Component" FontWeight="SemiBold" FontSize="14"/>
+											<Grid ColumnDefinitions="*,Auto">
+												<ComboBox Grid.Column="0" ItemsSource="{Binding ComponentTypes}"
+														  SelectedItem="{Binding SelectedComponentType}"
+														  PlaceholderText="Select component type..."
+														  VerticalAlignment="Center" Margin="0,0,8,0"/>
+												<Button Grid.Column="1" Content="Add" Command="{Binding AddComponentCommand}"
+														IsEnabled="{Binding CanAddComponent}" Classes="Primary" Padding="12,6"/>
+											</Grid>
+										</StackPanel>
+									</Border>
+
+									<!-- Components List -->
+									<StackPanel Spacing="6">
+										<TextBlock FontWeight="SemiBold" FontSize="14">
+											<TextBlock.Text>
+												<MultiBinding StringFormat="{}Components ({0})">
+													<Binding Path="SelectedPrefab.ComponentItems.Count"/>
+												</MultiBinding>
+											</TextBlock.Text>
+										</TextBlock>
+
+										<ItemsControl ItemsSource="{Binding SelectedPrefab.ComponentItems}">
+											<ItemsControl.ItemTemplate>
+												<DataTemplate DataType="models:ComponentItem">
+													<Border Classes="Card" Margin="0,0,0,4" BorderThickness="1">
+														<Expander IsExpanded="{Binding IsExpanded}">
+															<Expander.Header>
+																<Grid ColumnDefinitions="Auto,*,Auto">
+																	<Ellipse Grid.Column="0" Width="6" Height="6"
+																			 Fill="{DynamicResource AccentTextBrush}"
+																			 Margin="0,0,8,0" VerticalAlignment="Center"/>
+																	<TextBlock Grid.Column="1" Text="{Binding Type}"
+																			   FontWeight="Medium" VerticalAlignment="Center"/>
+																	<Button Grid.Column="2" Content="×"
+																			Command="{Binding $parent[UserControl].((vm:GameObjectViewModel)DataContext).RemoveComponentCommand}"
+																			CommandParameter="{Binding Type}"
+																			IsEnabled="{Binding !IsRequired}"
+																			Classes="Icon" Width="18" Height="18"
+																			Foreground="Red" ToolTip.Tip="Remove component"
+																			IsVisible="{Binding !IsRequired}"/>
+																</Grid>
+															</Expander.Header>
+															<Border Padding="8" Background="{DynamicResource SurfaceBackgroundBrush}"
+																	CornerRadius="3" Margin="0,4,0,0">
+																<StackPanel Spacing="6">
+																	<TextBox Text="{Binding FormattedJson}" AcceptsReturn="True"
+																			 TextWrapping="Wrap" Classes="Code"
+																			 MinHeight="60" ScrollViewer.VerticalScrollBarVisibility="Auto"
+																			 Padding="6"/>
+																	<TextBlock Text="⚠ Required Component" FontSize="10"
+																			   FontStyle="Italic" Foreground="{DynamicResource WarningColor}"
+																			   HorizontalAlignment="Right" IsVisible="{Binding IsRequired}"/>
+																</StackPanel>
+															</Border>
+														</Expander>
+													</Border>
+												</DataTemplate>
+											</ItemsControl.ItemTemplate>
+										</ItemsControl>
+									</StackPanel>
+								</StackPanel>
+							</ScrollViewer>
+
+							<!-- No Selection State -->
+							<StackPanel IsVisible="{Binding !HasSelectedPrefab}" HorizontalAlignment="Center"
+									   VerticalAlignment="Center" Spacing="16" Margin="20">
+								<TextBlock Text="📦" FontSize="32" HorizontalAlignment="Center" Opacity="0.5"/>
+								<TextBlock Text="No Prefab Selected" FontWeight="SemiBold" FontSize="16"
+										   HorizontalAlignment="Center" Foreground="{DynamicResource SecondaryTextBrush}"/>
+								<TextBlock Text="Select a prefab from the library above to edit it."
+										   TextWrapping="Wrap" TextAlignment="Center" FontSize="12"
+										   Foreground="{DynamicResource SecondaryTextBrush}" MaxWidth="250"/>
+								<Button Content="Create New Prefab" Command="{Binding CreateNewPrefabCommand}"
+										HorizontalAlignment="Center" Classes="Primary" Padding="16,8"/>
+							</StackPanel>
+						</Grid>
+					</Grid>
+				</Border>
+			</Grid>
+		</Grid>
+
+		<!-- Bottom Status Bar -->
+		<Border Grid.Row="2" Classes="StatusBar">
+			<StackPanel Orientation="Horizontal" Spacing="12">
+				<TextBlock Text="{Binding CurrentMode}" FontWeight="Medium"/>
+				<Rectangle Width="1" Height="12" Fill="{DynamicResource DividerBrush}"/>
+				<TextBlock>
+					<TextBlock.Text>
+						<MultiBinding StringFormat="{}{0} GameObjects">
+							<Binding Path="RootGameObjects.Count"/>
+						</MultiBinding>
+					</TextBlock.Text>
+				</TextBlock>
+				<Rectangle Width="1" Height="12" Fill="{DynamicResource DividerBrush}"/>
+				<TextBlock>
+					<TextBlock.Text>
+						<MultiBinding StringFormat="{}{0} Prefabs">
+							<Binding Path="PrefabLibrary.Count"/>
+						</MultiBinding>
+					</TextBlock.Text>
+				</TextBlock>
+			</StackPanel>
+		</Border>
+	</Grid>
+
+	<!-- Panel-specific Styles -->
+	<UserControl.Styles>
+		<!-- Enhanced RadioButton styling for mode toggles -->
+		<Style Selector="RadioButton.Tool:checked">
+			<Setter Property="Background" Value="{DynamicResource SelectionBackgroundBrush}"/>
+			<Setter Property="Foreground" Value="{DynamicResource SelectionTextBrush}"/>
+			<Setter Property="BorderBrush" Value="{DynamicResource SelectionBackgroundBrush}"/>
+		</Style>
+
+		<Style Selector="TreeViewItem">
+			<Setter Property="Padding" Value="4"/>
+		</Style>
+
+		<Style Selector="ListBoxItem">
+			<Setter Property="Padding" Value="0"/>
+			<Setter Property="Margin" Value="4,2"/>
+		</Style>
+
+		<!-- Component expander styling -->
+		<Style Selector="Expander">
+			<Setter Property="Background" Value="{DynamicResource SurfaceBackgroundBrush}"/>
+			<Setter Property="BorderBrush" Value="{DynamicResource BorderBrush}"/>
+		</Style>
+	</UserControl.Styles>
+
+</UserControl>

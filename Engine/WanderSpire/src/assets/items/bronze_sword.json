@@ -1,0 +1,8 @@
+{
+  "id": 120,
+  "name": "Bronze Sword",
+  "type": "weapon",
+  "slot": "MainHand",
+  "attack_speed": 5,
+  "bonuses": { "accuracy": 6, "strength": 5 }
+}

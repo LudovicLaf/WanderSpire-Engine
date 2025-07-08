@@ -1,0 +1,237 @@
+﻿<!-- SceneEditor/Views/Panels/ViewportPanel.axaml -->
+<UserControl x:Class="SceneEditor.Views.Panels.ViewportPanel"
+             xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:controls="using:SceneEditor.Controls"
+             x:Name="ViewportPanelRoot">
+
+	<Grid>
+		<Grid.RowDefinitions>
+			<RowDefinition Height="Auto" />
+			<RowDefinition Height="*" />
+			<RowDefinition Height="Auto" />
+		</Grid.RowDefinitions>
+
+		<!-- Modern Viewport Toolbar -->
+		<Border Grid.Row="0" Classes="Header">
+			<Grid ColumnDefinitions="*,Auto">
+				<!-- Left: View Controls -->
+				<StackPanel Grid.Column="0" Orientation="Horizontal" Spacing="12">
+					<!-- View Mode -->
+					<StackPanel Orientation="Horizontal" Spacing="8">
+						<TextBlock Text="View:" VerticalAlignment="Center"
+								   Foreground="{DynamicResource SecondaryTextBrush}" FontSize="12"/>
+						<ComboBox SelectedIndex="0" MinWidth="100" Height="28">
+							<ComboBoxItem Content="Scene" />
+							<ComboBoxItem Content="Wireframe" />
+							<ComboBoxItem Content="Textured" />
+						</ComboBox>
+					</StackPanel>
+
+					<Separator Width="1" Height="20"/>
+
+					<!-- View Options -->
+					<StackPanel Orientation="Horizontal" Spacing="6">
+						<CheckBox x:Name="GridToggle" Content="Grid" IsChecked="{Binding IsGridVisible}"
+								  Foreground="{DynamicResource PrimaryTextBrush}"/>
+						<CheckBox x:Name="GizmosToggle" Content="Gizmos" IsChecked="{Binding IsGizmosVisible}"
+								  Foreground="{DynamicResource PrimaryTextBrush}"/>
+					</StackPanel>
+
+					<Separator Width="1" Height="20"/>
+
+					<!-- Camera Controls -->
+					<StackPanel Orientation="Horizontal" Spacing="4">
+						<Button Classes="Icon" Command="{Binding ResetCameraCommand}" ToolTip.Tip="Reset Camera">
+							<TextBlock Text="🎯" FontSize="12"/>
+						</Button>
+						<Button Classes="Icon" Command="{Binding ZoomToFitCommand}" ToolTip.Tip="Fit All">
+							<TextBlock Text="⛶" FontSize="12"/>
+						</Button>
+						<Button Classes="Icon" Command="{Binding ZoomToSelectionCommand}" ToolTip.Tip="Focus Selection">
+							<TextBlock Text="🔍" FontSize="12"/>
+						</Button>
+					</StackPanel>
+				</StackPanel>
+
+				<!-- Right: Performance and Info -->
+				<StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="8">
+					<TextBlock Text="{Binding ZoomLevel, StringFormat='{}{0:P0}'}"
+							   VerticalAlignment="Center" FontFamily="{StaticResource CodeFont}"
+							   Foreground="{DynamicResource SecondaryTextBrush}" FontSize="12"/>
+					<Button Classes="Icon" ToolTip.Tip="Toggle Performance Display">
+						<TextBlock Text="📊" FontSize="12"/>
+					</Button>
+				</StackPanel>
+			</Grid>
+		</Border>
+
+		<!-- Main Viewport Area -->
+		<Grid Grid.Row="1">
+			<!-- OpenGL Viewport -->
+			<controls:OpenGLEditorViewport x:Name="OpenGLViewport"
+										   ViewModel="{Binding}"/>
+
+			<!-- Modern Loading Overlay -->
+			<Border x:Name="LoadingOverlay"
+					Background="#D0000000"
+					IsVisible="{Binding !IsEngineReady}">
+				<Border Classes="Card" HorizontalAlignment="Center" VerticalAlignment="Center"
+						Background="{DynamicResource CardBackgroundBrush}" Padding="32" MaxWidth="300">
+					<StackPanel Spacing="20">
+						<StackPanel Spacing="12" HorizontalAlignment="Center">
+							<TextBlock Text="⚙️" FontSize="48" HorizontalAlignment="Center" Opacity="0.8"/>
+							<TextBlock Text="Initializing Engine"
+									   Foreground="{DynamicResource PrimaryTextBrush}"
+									   FontSize="18" FontWeight="Medium"
+									   HorizontalAlignment="Center"/>
+							<TextBlock Text="Setting up the rendering system..."
+									   Foreground="{DynamicResource SecondaryTextBrush}"
+									   FontSize="12"
+									   HorizontalAlignment="Center"/>
+						</StackPanel>
+						<ProgressBar IsIndeterminate="True"
+									 Height="4" CornerRadius="2"
+									 Background="{DynamicResource PanelBackgroundBrush}"
+									 Foreground="{DynamicResource SelectionBackgroundBrush}"/>
+					</StackPanel>
+				</Border>
+			</Border>
+
+			<!-- Modern Error Overlay -->
+			<Border Background="#E0000000" IsVisible="{Binding HasRenderingError}">
+				<Border Classes="Card" HorizontalAlignment="Center" VerticalAlignment="Center"
+						Background="{DynamicResource CardBackgroundBrush}" Padding="32" MaxWidth="400">
+					<StackPanel Spacing="20">
+						<StackPanel Spacing="12" HorizontalAlignment="Center">
+							<TextBlock Text="⚠️" FontSize="48" HorizontalAlignment="Center"/>
+							<TextBlock Text="Rendering Error"
+									   Foreground="{DynamicResource PrimaryTextBrush}"
+									   FontSize="18" FontWeight="Bold"
+									   HorizontalAlignment="Center"/>
+							<TextBlock Text="{Binding ErrorMessage}"
+									   Foreground="{DynamicResource SecondaryTextBrush}"
+									   FontSize="12" TextWrapping="Wrap"
+									   HorizontalAlignment="Center" TextAlignment="Center"/>
+						</StackPanel>
+						<Button Content="Retry Initialization" Classes="Primary"
+								Command="{Binding RetryInitializationCommand}"
+								HorizontalAlignment="Center" Padding="20,10"/>
+					</StackPanel>
+				</Border>
+			</Border>
+
+			<!-- Modern Performance Display -->
+			<Border x:Name="PerformanceDisplay"
+					HorizontalAlignment="Right" VerticalAlignment="Top"
+					Classes="Card" Margin="12" Padding="12"
+					IsVisible="False" MaxWidth="200">
+				<StackPanel Spacing="8">
+					<TextBlock Text="Performance" FontWeight="SemiBold" FontSize="12"
+							   Foreground="{DynamicResource PrimaryTextBrush}"/>
+					<Separator Height="1" Background="{DynamicResource DividerBrush}"/>
+					<Grid ColumnDefinitions="*,Auto" RowDefinitions="Auto,Auto,Auto" RowSpacing="4">
+						<TextBlock Grid.Row="0" Grid.Column="0" Text="FPS:" FontSize="11"
+								   Foreground="{DynamicResource SecondaryTextBrush}"/>
+						<TextBlock Grid.Row="0" Grid.Column="1" x:Name="FpsCounter" Text="60"
+								   FontFamily="{StaticResource CodeFont}" FontSize="11"
+								   Foreground="{DynamicResource PrimaryTextBrush}"/>
+
+						<TextBlock Grid.Row="1" Grid.Column="0" Text="Entities:" FontSize="11"
+								   Foreground="{DynamicResource SecondaryTextBrush}"/>
+						<TextBlock Grid.Row="1" Grid.Column="1" x:Name="EntityCount" Text="0"
+								   FontFamily="{StaticResource CodeFont}" FontSize="11"
+								   Foreground="{DynamicResource PrimaryTextBrush}"/>
+
+						<TextBlock Grid.Row="2" Grid.Column="0" Text="Render:" FontSize="11"
+								   Foreground="{DynamicResource SecondaryTextBrush}"/>
+						<TextBlock Grid.Row="2" Grid.Column="1" x:Name="RenderTime" Text="16.7ms"
+								   FontFamily="{StaticResource CodeFont}" FontSize="11"
+								   Foreground="{DynamicResource PrimaryTextBrush}"/>
+					</Grid>
+				</StackPanel>
+			</Border>
+		</Grid>
+
+		<!-- Modern Status Bar -->
+		<Border Grid.Row="2" Classes="StatusBar">
+			<Grid ColumnDefinitions="*,Auto,Auto,Auto">
+				<!-- Status Text -->
+				<TextBlock x:Name="ViewportStatus" Grid.Column="0" Text="Ready" VerticalAlignment="Center"/>
+
+				<!-- Selection Info -->
+				<StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="4" Margin="16,0">
+					<TextBlock Text="🎯" FontSize="10" VerticalAlignment="Center"/>
+					<TextBlock x:Name="SelectionInfo" Text="No selection" VerticalAlignment="Center"
+							   FontSize="12" Foreground="{DynamicResource SecondaryTextBrush}"/>
+				</StackPanel>
+
+				<!-- Mouse Position -->
+				<StackPanel Grid.Column="2" Orientation="Horizontal" Spacing="12" Margin="16,0">
+					<TextBlock x:Name="MouseWorldPos" Text="World: (0.0, 0.0)" VerticalAlignment="Center"
+							   FontFamily="{StaticResource CodeFont}" FontSize="11"
+							   Foreground="{DynamicResource SecondaryTextBrush}"/>
+					<TextBlock x:Name="MouseGridPos" Text="Grid: (0, 0)" VerticalAlignment="Center"
+							   FontFamily="{StaticResource CodeFont}" FontSize="11"
+							   Foreground="{DynamicResource SecondaryTextBrush}"/>
+				</StackPanel>
+
+				<!-- Zoom Level -->
+				<TextBlock Grid.Column="3" Text="{Binding ZoomLevel, StringFormat='Zoom: {0:P0}'}"
+						   VerticalAlignment="Center" FontFamily="{StaticResource CodeFont}"
+						   FontSize="11" Foreground="{DynamicResource SecondaryTextBrush}"
+						   Margin="16,0"/>
+			</Grid>
+		</Border>
+	</Grid>
+
+	<!-- Viewport-specific Styles -->
+	<UserControl.Styles>
+		<!-- Performance display animations -->
+		<Style Selector="Border#PerformanceDisplay">
+			<Setter Property="Transitions">
+				<Transitions>
+					<DoubleTransition Property="Opacity" Duration="0:0:0.2"/>
+					<TransformOperationsTransition Property="RenderTransform" Duration="0:0:0.2"/>
+				</Transitions>
+			</Setter>
+		</Style>
+
+		<!-- Viewport controls hover effects -->
+		<Style Selector="Button">
+			<Setter Property="Transitions">
+				<Transitions>
+					<BrushTransition Property="Background" Duration="0:0:0.15"/>
+					<BrushTransition Property="BorderBrush" Duration="0:0:0.15"/>
+				</Transitions>
+			</Setter>
+		</Style>
+
+		<!-- ComboBox styling -->
+		<Style Selector="ComboBox">
+			<Setter Property="Background" Value="{DynamicResource SurfaceBackgroundBrush}"/>
+			<Setter Property="BorderBrush" Value="{DynamicResource BorderBrush}"/>
+			<Setter Property="Foreground" Value="{DynamicResource PrimaryTextBrush}"/>
+		</Style>
+
+		<!-- CheckBox styling -->
+		<Style Selector="CheckBox">
+			<Setter Property="FontSize" Value="12"/>
+		</Style>
+
+		<!-- Loading overlay animations -->
+		<Style Selector="Border#LoadingOverlay">
+			<Setter Property="Transitions">
+				<Transitions>
+					<DoubleTransition Property="Opacity" Duration="0:0:0.3"/>
+				</Transitions>
+			</Setter>
+		</Style>
+
+		<!-- Status bar text styling -->
+		<Style Selector="TextBlock">
+			<Setter Property="VerticalAlignment" Value="Center"/>
+		</Style>
+	</UserControl.Styles>
+
+</UserControl>

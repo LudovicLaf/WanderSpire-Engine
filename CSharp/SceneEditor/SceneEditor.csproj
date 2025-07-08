@@ -1,0 +1,65 @@
+﻿<!-- File: CSharp/SceneEditor/SceneEditor.csproj -->
+<Project Sdk="Microsoft.NET.Sdk">
+
+	<PropertyGroup>
+		<OutputType>WinExe</OutputType>
+		<TargetFramework>net8.0</TargetFramework>
+		<Nullable>enable</Nullable>
+		<AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+		<UseWPF>false</UseWPF>
+		<UseWindowsForms>false</UseWindowsForms>
+		<ApplicationIcon>Resources/Icons/editor.ico</ApplicationIcon>
+		<Platforms>x64</Platforms>
+	</PropertyGroup>
+
+	<PropertyGroup Label="Avalonia">
+		<AvaloniaXamlIlDebuggerLaunch>False</AvaloniaXamlIlDebuggerLaunch>
+	</PropertyGroup>
+
+	<ItemGroup>
+		<ProjectReference Include="..\ScriptHost\ScriptHost.csproj" />
+		<ProjectReference Include="..\Game\Game.csproj" />
+	</ItemGroup>
+
+	<!-- Native DLLs -->
+	<ItemGroup>
+		<None Include="..\..\out\build\vs2022\EngineCore\$(Configuration)\EngineCore.dll" CopyToOutputDirectory="PreserveNewest" />
+		<None Include="..\..\out\build\vs2022\EngineCore\$(Configuration)\SDL3.dll" CopyToOutputDirectory="PreserveNewest" />
+		<None Include="..\..\out\build\vs2022\EngineCore\$(Configuration)\fmtd.dll" CopyToOutputDirectory="PreserveNewest" />
+		<None Include="..\..\out\build\vs2022\EngineCore\$(Configuration)\spdlogd.dll" CopyToOutputDirectory="PreserveNewest" />
+	</ItemGroup>
+
+	<!-- Assets -->
+	<ItemGroup>
+		<Content Include="..\Assets\**\*.*">
+			<Link>Assets\%(RecursiveDir)%(Filename)%(Extension)</Link>
+			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+		</Content>
+	</ItemGroup>
+
+	<ItemGroup>
+		<AvaloniaResource Include="Resources\**" />
+		<!-- FontAwesome fonts -->
+		<AvaloniaResource Include="..\Assets\fonts\fa-solid-900.ttf">
+			<Link>Assets\fonts\fa-solid-900.ttf</Link>
+		</AvaloniaResource>
+		<AvaloniaResource Include="..\Assets\fonts\fa-regular-400.ttf">
+			<Link>Assets\fonts\fa-regular-400.ttf</Link>
+		</AvaloniaResource>
+	</ItemGroup>
+
+	<ItemGroup>
+		<PackageReference Include="Avalonia" Version="11.3.1" />
+		<PackageReference Include="Avalonia.Desktop" Version="11.3.1" />
+		<PackageReference Include="Avalonia.Fonts.Inter" Version="11.3.1" />
+		<PackageReference Include="Avalonia.ReactiveUI" Version="11.3.1" />
+		<PackageReference Include="Avalonia.Themes.Fluent" Version="11.3.1" />
+		<PackageReference Include="Dock.Avalonia" Version="11.3.0.2" />
+		<PackageReference Include="Dock.Model.ReactiveUI" Version="11.3.0.2" />
+		<PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="9.0.6" />
+		<PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
+		<PackageReference Include="ReactiveUI" Version="20.3.1" />
+		<PackageReference Include="System.Reactive" Version="6.0.1" />
+	</ItemGroup>
+
+</Project>

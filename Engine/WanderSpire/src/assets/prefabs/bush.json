@@ -1,0 +1,22 @@
+{
+  "name": "bush",
+  "components": {
+    "NameComponent": { "name": "Bush" },
+    "TagComponent": { "tag": "scenery" },
+
+    "GridPositionComponent": { "tile": [0, 0] },
+    "TransformComponent": {
+      "position": [0, 0],
+      "rotation": 0,
+      "scale": [1, 1]
+    },
+
+    "SpriteComponent": { "atlasName": "environment", "frameName": "bush_1" },
+
+    "ObstacleComponent": {
+      "blocksMovement": true,
+      "blocksVision": true,
+      "zOrder": 1
+    }
+  }
+}

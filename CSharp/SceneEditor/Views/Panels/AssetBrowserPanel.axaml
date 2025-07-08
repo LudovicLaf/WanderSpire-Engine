@@ -1,0 +1,369 @@
+﻿<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:vm="using:SceneEditor.ViewModels"
+             xmlns:models="using:SceneEditor.Models"
+             xmlns:converters="using:SceneEditor.Converters"
+             mc:Ignorable="d"
+             d:DesignWidth="800"
+             d:DesignHeight="600"
+             x:Class="SceneEditor.Views.Panels.AssetBrowserPanel"
+             x:DataType="vm:AssetBrowserViewModel">
+
+	<!-- Resources -->
+	<UserControl.Resources>
+		<ResourceDictionary>
+			<!-- Context menu shared by all items -->
+			<ContextMenu x:Key="AssetContextMenu">
+				<MenuItem Header="Open" Command="{Binding OpenAssetCommand}" CommandParameter="{Binding}">
+					<MenuItem.Icon>
+						<TextBlock Text="{StaticResource IconOpen}" FontFamily="{StaticResource FontAwesome}" FontSize="12"/>
+					</MenuItem.Icon>
+				</MenuItem>
+				<Separator/>
+				<MenuItem Header="Create">
+					<MenuItem.Icon>
+						<TextBlock Text="+" FontWeight="Bold" FontSize="12"/>
+					</MenuItem.Icon>
+					<MenuItem Header="Folder" Command="{Binding $parent[UserControl].DataContext.CreateFolderCommand}">
+						<MenuItem.Icon>
+							<TextBlock Text="{StaticResource IconFolder}" FontFamily="{StaticResource FontAwesome}" FontSize="12"/>
+						</MenuItem.Icon>
+					</MenuItem>
+					<MenuItem Header="Scene" Command="{Binding $parent[UserControl].DataContext.CreateSceneCommand}">
+						<MenuItem.Icon>
+							<TextBlock Text="{StaticResource IconCube}" FontFamily="{StaticResource FontAwesome}" FontSize="12"/>
+						</MenuItem.Icon>
+					</MenuItem>
+					<MenuItem Header="Prefab" Command="{Binding $parent[UserControl].DataContext.CreatePrefabCommand}">
+						<MenuItem.Icon>
+							<TextBlock Text="{StaticResource IconCube}" FontFamily="{StaticResource FontAwesome}" FontSize="12"/>
+						</MenuItem.Icon>
+					</MenuItem>
+					<MenuItem Header="Script" Command="{Binding $parent[UserControl].DataContext.CreateScriptCommand}">
+						<MenuItem.Icon>
+							<TextBlock Text="{StaticResource IconFile}" FontFamily="{StaticResource FontAwesome}" FontSize="12"/>
+						</MenuItem.Icon>
+					</MenuItem>
+				</MenuItem>
+				<Separator/>
+				<MenuItem Header="Rename" Command="{Binding $parent[UserControl].DataContext.RenameAssetCommand}" CommandParameter="{Binding}">
+					<MenuItem.Icon>
+						<TextBlock Text="✏" FontSize="12"/>
+					</MenuItem.Icon>
+				</MenuItem>
+				<MenuItem Header="Delete" Command="{Binding $parent[UserControl].DataContext.DeleteAssetCommand}" CommandParameter="{Binding}">
+					<MenuItem.Icon>
+						<TextBlock Text="🗑" FontSize="12"/>
+					</MenuItem.Icon>
+				</MenuItem>
+				<Separator/>
+				<MenuItem Header="Show in Explorer" Command="{Binding $parent[UserControl].DataContext.ShowInExplorerCommand}" CommandParameter="{Binding}">
+					<MenuItem.Icon>
+						<TextBlock Text="{StaticResource IconFolder}" FontFamily="{StaticResource FontAwesome}" FontSize="12"/>
+					</MenuItem.Icon>
+				</MenuItem>
+			</ContextMenu>
+
+			<!-- Tree template -->
+			<TreeDataTemplate x:Key="TreeItemTemplate" DataType="models:AssetItem" ItemsSource="{Binding Children}">
+				<Border Background="Transparent" Padding="4,2" ContextMenu="{StaticResource AssetContextMenu}">
+					<Grid ColumnDefinitions="Auto,*,Auto">
+						<!-- Icon -->
+						<Border Grid.Column="0" Width="16" Height="16" Margin="0,0,6,0">
+							<TextBlock Text="{Binding Icon}" FontFamily="{StaticResource FontAwesome}" FontSize="12"
+									   HorizontalAlignment="Center" VerticalAlignment="Center"
+									   Foreground="{DynamicResource AccentTextBrush}"/>
+						</Border>
+						<!-- Name -->
+						<TextBlock Grid.Column="1" Text="{Binding Name}" VerticalAlignment="Center"
+								   TextTrimming="CharacterEllipsis" ToolTip.Tip="{Binding ToolTipText}"
+								   Foreground="{DynamicResource PrimaryTextBrush}"/>
+						<!-- Size -->
+						<TextBlock Grid.Column="2" Text="{Binding FormattedSize}" VerticalAlignment="Center"
+								   Margin="6,0,0,0" FontSize="10"
+								   Foreground="{DynamicResource SecondaryTextBrush}"
+								   IsVisible="{Binding !IsFolder}"/>
+					</Grid>
+				</Border>
+			</TreeDataTemplate>
+
+			<!-- Grid template - simplified -->
+			<DataTemplate x:Key="GridItemTemplate" DataType="models:AssetItem">
+				<Border Background="Transparent"
+						Width="100" Height="100"
+						Margin="2"
+						Padding="8"
+						ContextMenu="{StaticResource AssetContextMenu}">
+					<StackPanel HorizontalAlignment="Center" VerticalAlignment="Center" Spacing="6">
+						<Border Width="32" Height="32" CornerRadius="4"
+								Background="{DynamicResource PanelBackgroundBrush}">
+							<TextBlock Text="{Binding Icon}" FontFamily="{StaticResource FontAwesome}" FontSize="18"
+									   HorizontalAlignment="Center" VerticalAlignment="Center"
+									   Foreground="{DynamicResource AccentTextBrush}"/>
+						</Border>
+						<TextBlock Text="{Binding NameWithoutExtension}"
+								   HorizontalAlignment="Center" TextAlignment="Center"
+								   TextWrapping="Wrap" FontSize="10" MaxWidth="80"
+								   TextTrimming="CharacterEllipsis" ToolTip.Tip="{Binding ToolTipText}"
+								   Foreground="{DynamicResource PrimaryTextBrush}"/>
+					</StackPanel>
+				</Border>
+			</DataTemplate>
+
+			<!-- List template -->
+			<DataTemplate x:Key="ListItemTemplate" DataType="models:AssetItem">
+				<Border Background="Transparent" Padding="6,3" ContextMenu="{StaticResource AssetContextMenu}">
+					<Grid ColumnDefinitions="Auto,*,Auto,Auto">
+						<Border Grid.Column="0" Width="16" Height="16" Margin="0,0,8,0">
+							<TextBlock Text="{Binding Icon}" FontFamily="{StaticResource FontAwesome}" FontSize="12"
+									   HorizontalAlignment="Center" VerticalAlignment="Center"
+									   Foreground="{DynamicResource AccentTextBrush}"/>
+						</Border>
+						<TextBlock Grid.Column="1" Text="{Binding Name}" VerticalAlignment="Center"
+								   TextTrimming="CharacterEllipsis" ToolTip.Tip="{Binding ToolTipText}"
+								   Foreground="{DynamicResource PrimaryTextBrush}"/>
+						<TextBlock Grid.Column="2" Text="{Binding FormattedSize}" VerticalAlignment="Center"
+								   Margin="8,0" FontSize="10" MinWidth="50" TextAlignment="Right"
+								   Foreground="{DynamicResource SecondaryTextBrush}"
+								   IsVisible="{Binding !IsFolder}"/>
+						<TextBlock Grid.Column="3" Text="{Binding LastModified, StringFormat='{}{0:MM/dd/yy}'}"
+								   VerticalAlignment="Center" FontSize="10" MinWidth="50"
+								   Foreground="{DynamicResource SecondaryTextBrush}"/>
+					</Grid>
+				</Border>
+			</DataTemplate>
+		</ResourceDictionary>
+	</UserControl.Resources>
+
+	<!-- Layout -->
+	<Border Classes="Panel">
+		<DockPanel>
+			<!-- Header -->
+			<Border DockPanel.Dock="Top" Classes="Header">
+				<Grid ColumnDefinitions="*,Auto">
+					<TextBlock Grid.Column="0" Text="Assets" Classes="PanelHeader"/>
+
+					<!-- Right-side controls -->
+					<StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="4">
+						<!-- View toggle buttons -->
+						<StackPanel Orientation="Horizontal" Spacing="1">
+							<RadioButton GroupName="ViewMode" IsChecked="{Binding IsTreeView}"
+										 Classes="ViewToggle" ToolTip.Tip="Tree View"
+										 Command="{Binding SetViewModeCommand}" CommandParameter="Tree">
+								<TextBlock Text="☰" FontSize="12"/>
+							</RadioButton>
+							<RadioButton GroupName="ViewMode" IsChecked="{Binding IsGridView}"
+										 Classes="ViewToggle" ToolTip.Tip="Grid View"
+										 Command="{Binding SetViewModeCommand}" CommandParameter="Grid">
+								<TextBlock Text="⚏" FontSize="12"/>
+							</RadioButton>
+							<RadioButton GroupName="ViewMode" IsChecked="{Binding IsListView}"
+										 Classes="ViewToggle" ToolTip.Tip="List View"
+										 Command="{Binding SetViewModeCommand}" CommandParameter="List">
+								<TextBlock Text="☰" FontSize="12"/>
+							</RadioButton>
+						</StackPanel>
+
+						<!-- Refresh button -->
+						<Button Classes="Icon" Command="{Binding RefreshCommand}" ToolTip.Tip="Refresh Assets">
+							<TextBlock Text="🔄" FontSize="11"/>
+						</Button>
+
+						<!-- Create dropdown -->
+						<Button Classes="Icon" ToolTip.Tip="Create Asset">
+							<Button.Flyout>
+								<MenuFlyout Placement="Bottom">
+									<MenuItem Header="Folder" Command="{Binding CreateFolderCommand}">
+										<MenuItem.Icon>
+											<TextBlock Text="{StaticResource IconFolder}" FontFamily="{StaticResource FontAwesome}" FontSize="12"/>
+										</MenuItem.Icon>
+									</MenuItem>
+									<MenuItem Header="Scene" Command="{Binding CreateSceneCommand}">
+										<MenuItem.Icon>
+											<TextBlock Text="{StaticResource IconCube}" FontFamily="{StaticResource FontAwesome}" FontSize="12"/>
+										</MenuItem.Icon>
+									</MenuItem>
+									<MenuItem Header="Prefab" Command="{Binding CreatePrefabCommand}">
+										<MenuItem.Icon>
+											<TextBlock Text="{StaticResource IconCube}" FontFamily="{StaticResource FontAwesome}" FontSize="12"/>
+										</MenuItem.Icon>
+									</MenuItem>
+									<MenuItem Header="Script" Command="{Binding CreateScriptCommand}">
+										<MenuItem.Icon>
+											<TextBlock Text="{StaticResource IconFile}" FontFamily="{StaticResource FontAwesome}" FontSize="12"/>
+										</MenuItem.Icon>
+									</MenuItem>
+									<Separator/>
+									<MenuItem Header="Import..." Command="{Binding ImportAssetCommand}">
+										<MenuItem.Icon>
+											<TextBlock Text="📁" FontSize="12"/>
+										</MenuItem.Icon>
+									</MenuItem>
+								</MenuFlyout>
+							</Button.Flyout>
+							<TextBlock Text="+" FontWeight="Bold" FontSize="12"/>
+						</Button>
+					</StackPanel>
+				</Grid>
+			</Border>
+
+			<!-- Search and filter bar -->
+			<Border DockPanel.Dock="Top" Padding="8,6"
+					BorderThickness="0,0,0,1" BorderBrush="{DynamicResource DividerBrush}">
+				<Grid ColumnDefinitions="*,Auto">
+					<!-- Search box -->
+					<TextBox Grid.Column="0" x:Name="SearchTextBox" Classes="Search"
+							 Text="{Binding SearchText}" Watermark="Search assets..."
+							 MinHeight="28"/>
+					<!-- Type filter -->
+					<ComboBox Grid.Column="1" Margin="6,0,0,0" SelectedItem="{Binding TypeFilter}"
+							  PlaceholderText="All Types" MinWidth="100" MinHeight="28">
+						<ComboBoxItem Content="All Types"/>
+						<ComboBoxItem Content="Scenes" Tag="Scene"/>
+						<ComboBoxItem Content="Prefabs" Tag="Prefab"/>
+						<ComboBoxItem Content="Textures" Tag="Texture"/>
+						<ComboBoxItem Content="Audio" Tag="Audio"/>
+						<ComboBoxItem Content="Scripts" Tag="Script"/>
+						<ComboBoxItem Content="Fonts" Tag="Font"/>
+						<ComboBoxItem Content="Shaders" Tag="Shader"/>
+					</ComboBox>
+				</Grid>
+			</Border>
+
+			<!-- Status bar -->
+			<Border DockPanel.Dock="Bottom" Classes="StatusBar">
+				<Grid ColumnDefinitions="*,Auto">
+					<TextBlock Grid.Column="0" Text="{Binding StatusText}" VerticalAlignment="Center"/>
+					<TextBlock Grid.Column="1" Text="{Binding AssetCount, StringFormat='{}{0} assets'}"
+							   VerticalAlignment="Center" Foreground="{DynamicResource SecondaryTextBrush}"/>
+				</Grid>
+			</Border>
+
+			<!-- Content area -->
+			<Grid>
+				<!-- Loading overlay -->
+				<Border IsVisible="{Binding IsLoading}" Background="{DynamicResource PanelBackgroundBrush}"
+						CornerRadius="4" Padding="16">
+					<StackPanel HorizontalAlignment="Center" VerticalAlignment="Center" Spacing="8">
+						<ProgressBar IsIndeterminate="True" Width="150" Height="3" CornerRadius="2"/>
+						<TextBlock Text="Loading assets..." HorizontalAlignment="Center"
+								   Foreground="{DynamicResource SecondaryTextBrush}" FontSize="12"/>
+					</StackPanel>
+				</Border>
+
+				<!-- Tree view -->
+				<TreeView ItemsSource="{Binding RootAssets}" SelectedItem="{Binding SelectedAsset}"
+						  ItemTemplate="{StaticResource TreeItemTemplate}" IsVisible="{Binding IsTreeView}"
+						  Padding="4">
+					<TreeView.Styles>
+						<Style Selector="TreeViewItem">
+							<Setter Property="IsExpanded" Value="{Binding IsExpanded, Mode=TwoWay}"/>
+							<Setter Property="Padding" Value="2"/>
+						</Style>
+					</TreeView.Styles>
+				</TreeView>
+
+				<!-- Grid view -->
+				<ScrollViewer IsVisible="{Binding IsGridView}"
+							  HorizontalScrollBarVisibility="Disabled"
+							  VerticalScrollBarVisibility="Auto"
+							  Padding="4">
+					<ItemsControl ItemsSource="{Binding FilteredAssets}"
+								  ItemTemplate="{StaticResource GridItemTemplate}">
+						<ItemsControl.ItemsPanel>
+							<ItemsPanelTemplate>
+								<WrapPanel Orientation="Horizontal"/>
+							</ItemsPanelTemplate>
+						</ItemsControl.ItemsPanel>
+					</ItemsControl>
+				</ScrollViewer>
+
+				<!-- List view -->
+				<ListBox ItemsSource="{Binding FilteredAssets}" SelectedItem="{Binding SelectedAsset}"
+						 ItemTemplate="{StaticResource ListItemTemplate}" IsVisible="{Binding IsListView}"
+						 ScrollViewer.HorizontalScrollBarVisibility="Disabled"
+						 Padding="4"/>
+
+				<!-- Empty state -->
+				<StackPanel HorizontalAlignment="Center" VerticalAlignment="Center" Spacing="12"
+							IsVisible="{Binding IsEmpty}">
+					<TextBlock Text="📁" FontSize="32" HorizontalAlignment="Center" Opacity="0.5"/>
+					<StackPanel Spacing="6" HorizontalAlignment="Center">
+						<TextBlock Text="No assets found" FontSize="14" FontWeight="Medium"
+								   HorizontalAlignment="Center" Foreground="{DynamicResource SecondaryTextBrush}"/>
+						<TextBlock Text="Create some assets or check your search filters"
+								   FontSize="11" HorizontalAlignment="Center"
+								   Foreground="{DynamicResource SecondaryTextBrush}"/>
+					</StackPanel>
+					<Button Content="Refresh Assets" Classes="Primary"
+							Command="{Binding RefreshCommand}" Margin="0,6,0,0"
+							HorizontalAlignment="Center" Padding="12,6"/>
+				</StackPanel>
+			</Grid>
+		</DockPanel>
+	</Border>
+
+	<!-- Local styles -->
+	<UserControl.Styles>
+		<!-- Clean hover effects for list items -->
+		<Style Selector="TreeViewItem:pointerover">
+			<Setter Property="Background" Value="{DynamicResource HoverBackgroundBrush}"/>
+		</Style>
+
+		<Style Selector="ListBoxItem:pointerover">
+			<Setter Property="Background" Value="{DynamicResource HoverBackgroundBrush}"/>
+		</Style>
+
+		<Style Selector="ListBoxItem:selected">
+			<Setter Property="Background" Value="{DynamicResource SelectionBackgroundBrush}"/>
+			<Setter Property="Foreground" Value="{DynamicResource SelectionTextBrush}"/>
+		</Style>
+
+		<!-- View toggle styling -->
+		<Style Selector="RadioButton.ViewToggle">
+			<Setter Property="Width" Value="24"/>
+			<Setter Property="Height" Value="24"/>
+			<Setter Property="Padding" Value="4"/>
+			<Setter Property="Background" Value="Transparent"/>
+			<Setter Property="BorderThickness" Value="1"/>
+			<Setter Property="BorderBrush" Value="{DynamicResource BorderBrush}"/>
+			<Setter Property="Template">
+				<ControlTemplate>
+					<Border Background="{TemplateBinding Background}"
+							BorderBrush="{TemplateBinding BorderBrush}"
+							BorderThickness="{TemplateBinding BorderThickness}"
+							Padding="{TemplateBinding Padding}">
+						<ContentPresenter Content="{TemplateBinding Content}"
+										  HorizontalAlignment="Center"
+										  VerticalAlignment="Center"/>
+					</Border>
+				</ControlTemplate>
+			</Setter>
+		</Style>
+
+		<Style Selector="RadioButton.ViewToggle:first-child">
+			<Setter Property="CornerRadius" Value="3,0,0,3"/>
+		</Style>
+
+		<Style Selector="RadioButton.ViewToggle:last-child">
+			<Setter Property="CornerRadius" Value="0,3,3,0"/>
+		</Style>
+
+		<Style Selector="RadioButton.ViewToggle:checked">
+			<Setter Property="Background" Value="{DynamicResource SelectionBackgroundBrush}"/>
+			<Setter Property="Foreground" Value="{DynamicResource SelectionTextBrush}"/>
+			<Setter Property="BorderBrush" Value="{DynamicResource SelectionBackgroundBrush}"/>
+		</Style>
+
+		<Style Selector="RadioButton.ViewToggle:pointerover">
+			<Setter Property="Background" Value="{DynamicResource HoverBackgroundBrush}"/>
+		</Style>
+
+		<!-- Remove unwanted transitions -->
+		<Style Selector="Border">
+			<Setter Property="Transitions" Value="{x:Null}"/>
+		</Style>
+	</UserControl.Styles>
+</UserControl>

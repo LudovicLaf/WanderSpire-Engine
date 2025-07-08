@@ -1,0 +1,226 @@
+﻿<!-- File: CSharp/SceneEditor/Views/Panels/ToolboxPanel.axaml -->
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:vm="using:SceneEditor.ViewModels"
+             xmlns:services="using:SceneEditor.Services"
+             xmlns:converters="using:SceneEditor.Converters"
+             mc:Ignorable="d" d:DesignWidth="250" d:DesignHeight="300"
+             x:Class="SceneEditor.Views.Panels.ToolboxPanel"
+             x:DataType="vm:ToolboxViewModel">
+
+	<Border Classes="Panel">
+		<DockPanel>
+			<!-- Header -->
+			<Border DockPanel.Dock="Top" Classes="Header">
+				<TextBlock Text="Toolbox" Classes="PanelHeader" />
+			</Border>
+
+			<!-- Tool Categories -->
+			<ScrollViewer VerticalScrollBarVisibility="Auto">
+				<StackPanel Spacing="12" Margin="8">
+
+					<!-- Selection Tools -->
+					<Border Classes="Card" Padding="8">
+						<StackPanel Spacing="8">
+							<TextBlock Text="Selection" FontWeight="SemiBold" FontSize="14"
+									   Foreground="{DynamicResource PrimaryTextBrush}"/>
+
+							<WrapPanel Orientation="Horizontal">
+								<ItemsControl ItemsSource="{Binding SelectionTools}">
+									<ItemsControl.ItemsPanel>
+										<ItemsPanelTemplate>
+											<WrapPanel Orientation="Horizontal" />
+										</ItemsPanelTemplate>
+									</ItemsControl.ItemsPanel>
+
+									<ItemsControl.ItemTemplate>
+										<DataTemplate DataType="services:IEditorTool">
+											<ToggleButton Classes="Tool"
+														  IsChecked="{Binding IsActive}"
+														  Command="{Binding $parent[UserControl].DataContext.SelectToolCommand}"
+														  CommandParameter="{Binding}"
+														  ToolTip.Tip="{Binding Description}"
+														  Margin="2">
+												<TextBlock Text="{Binding Icon}"
+														   FontFamily="{StaticResource FontAwesome}"
+														   FontSize="16"
+														   HorizontalAlignment="Center"
+														   VerticalAlignment="Center" />
+											</ToggleButton>
+										</DataTemplate>
+									</ItemsControl.ItemTemplate>
+								</ItemsControl>
+							</WrapPanel>
+						</StackPanel>
+					</Border>
+
+					<!-- Tile Tools -->
+					<Border Classes="Card" Padding="8">
+						<StackPanel Spacing="8">
+							<TextBlock Text="Tile Editing" FontWeight="SemiBold" FontSize="14"
+									   Foreground="{DynamicResource PrimaryTextBrush}"/>
+
+							<WrapPanel Orientation="Horizontal">
+								<ItemsControl ItemsSource="{Binding TileTools}">
+									<ItemsControl.ItemsPanel>
+										<ItemsPanelTemplate>
+											<WrapPanel Orientation="Horizontal" />
+										</ItemsPanelTemplate>
+									</ItemsControl.ItemsPanel>
+
+									<ItemsControl.ItemTemplate>
+										<DataTemplate DataType="services:IEditorTool">
+											<ToggleButton Classes="Tool"
+														  IsChecked="{Binding IsActive}"
+														  Command="{Binding $parent[UserControl].DataContext.SelectToolCommand}"
+														  CommandParameter="{Binding}"
+														  ToolTip.Tip="{Binding Description}"
+														  Margin="2">
+												<TextBlock Text="{Binding Icon}"
+														   FontFamily="{StaticResource FontAwesome}"
+														   FontSize="16"
+														   HorizontalAlignment="Center"
+														   VerticalAlignment="Center" />
+											</ToggleButton>
+										</DataTemplate>
+									</ItemsControl.ItemTemplate>
+								</ItemsControl>
+							</WrapPanel>
+						</StackPanel>
+					</Border>
+
+					<!-- Other Tools -->
+					<Border Classes="Card" Padding="8" IsVisible="{Binding OtherTools.Count, Converter={x:Static converters:GreaterThanZeroConverter.Instance}}">
+						<StackPanel Spacing="8">
+							<TextBlock Text="Other Tools" FontWeight="SemiBold" FontSize="14"
+									   Foreground="{DynamicResource PrimaryTextBrush}"/>
+
+							<WrapPanel Orientation="Horizontal">
+								<ItemsControl ItemsSource="{Binding OtherTools}">
+									<ItemsControl.ItemsPanel>
+										<ItemsPanelTemplate>
+											<WrapPanel Orientation="Horizontal" />
+										</ItemsPanelTemplate>
+									</ItemsControl.ItemsPanel>
+
+									<ItemsControl.ItemTemplate>
+										<DataTemplate DataType="services:IEditorTool">
+											<ToggleButton Classes="Tool"
+														  IsChecked="{Binding IsActive}"
+														  Command="{Binding $parent[UserControl].DataContext.SelectToolCommand}"
+														  CommandParameter="{Binding}"
+														  ToolTip.Tip="{Binding Description}"
+														  Margin="2">
+												<TextBlock Text="{Binding Icon}"
+														   FontFamily="{StaticResource FontAwesome}"
+														   FontSize="16"
+														   HorizontalAlignment="Center"
+														   VerticalAlignment="Center" />
+											</ToggleButton>
+										</DataTemplate>
+									</ItemsControl.ItemTemplate>
+								</ItemsControl>
+							</WrapPanel>
+						</StackPanel>
+					</Border>
+
+					<!-- Current Tool Info -->
+					<Border Classes="Card" Padding="12" IsVisible="{Binding SelectedTool, Converter={x:Static ObjectConverters.IsNotNull}}">
+						<StackPanel Spacing="8">
+							<TextBlock Text="Current Tool" FontWeight="SemiBold" FontSize="14"
+									   Foreground="{DynamicResource PrimaryTextBrush}"/>
+							<Separator Height="1" Background="{DynamicResource DividerBrush}"/>
+							<StackPanel Spacing="4">
+								<TextBlock Text="{Binding SelectedTool.DisplayName}" FontWeight="Medium"
+										   Foreground="{DynamicResource PrimaryTextBrush}"/>
+								<TextBlock Text="{Binding SelectedTool.Description}"
+										   FontSize="11"
+										   Foreground="{DynamicResource SecondaryTextBrush}"
+										   TextWrapping="Wrap" />
+							</StackPanel>
+						</StackPanel>
+					</Border>
+
+					<!-- Tool Tips -->
+					<Border Classes="Card" Padding="12">
+						<StackPanel Spacing="8">
+							<TextBlock Text="Tips" FontWeight="SemiBold" FontSize="14"
+									   Foreground="{DynamicResource PrimaryTextBrush}"/>
+							<Separator Height="1" Background="{DynamicResource DividerBrush}"/>
+							<StackPanel Spacing="4">
+								<TextBlock Text="• Click to select tools" FontSize="11"
+										   Foreground="{DynamicResource SecondaryTextBrush}"/>
+								<TextBlock Text="• Hold Shift for multi-selection" FontSize="11"
+										   Foreground="{DynamicResource SecondaryTextBrush}"/>
+								<TextBlock Text="• Press Esc to deselect" FontSize="11"
+										   Foreground="{DynamicResource SecondaryTextBrush}"/>
+							</StackPanel>
+						</StackPanel>
+					</Border>
+
+				</StackPanel>
+			</ScrollViewer>
+		</DockPanel>
+	</Border>
+
+	<!-- Local Styles -->
+	<UserControl.Styles>
+		<!-- Enhanced tool button styling -->
+		<Style Selector="ToggleButton.Tool">
+			<Setter Property="Width" Value="40" />
+			<Setter Property="Height" Value="40" />
+			<Setter Property="Padding" Value="6" />
+			<Setter Property="Background" Value="Transparent" />
+			<Setter Property="BorderThickness" Value="1" />
+			<Setter Property="BorderBrush" Value="Transparent" />
+			<Setter Property="CornerRadius" Value="6" />
+			<Setter Property="Transitions">
+				<Transitions>
+					<BrushTransition Property="Background" Duration="0:0:0.15"/>
+					<BrushTransition Property="BorderBrush" Duration="0:0:0.15"/>
+					<TransformOperationsTransition Property="RenderTransform" Duration="0:0:0.1"/>
+				</Transitions>
+			</Setter>
+		</Style>
+
+		<Style Selector="ToggleButton.Tool:pointerover">
+			<Setter Property="Background" Value="{DynamicResource HoverBackgroundBrush}" />
+			<Setter Property="BorderBrush" Value="{DynamicResource BorderBrush}" />
+			<Setter Property="RenderTransform" Value="scale(1.05)" />
+		</Style>
+
+		<Style Selector="ToggleButton.Tool:checked">
+			<Setter Property="Background" Value="{DynamicResource SelectionBackgroundBrush}" />
+			<Setter Property="Foreground" Value="{DynamicResource SelectionTextBrush}" />
+			<Setter Property="BorderBrush" Value="{DynamicResource SelectionBackgroundBrush}" />
+		</Style>
+
+		<Style Selector="ToggleButton.Tool:checked:pointerover">
+			<Setter Property="Background" Value="{DynamicResource SelectionBackgroundBrush}" />
+			<Setter Property="Opacity" Value="0.9" />
+		</Style>
+
+		<Style Selector="ToggleButton.Tool:pressed">
+			<Setter Property="RenderTransform" Value="scale(0.95)" />
+		</Style>
+
+		<!-- WrapPanel spacing -->
+		<Style Selector="WrapPanel">
+			<Setter Property="HorizontalAlignment" Value="Left" />
+		</Style>
+
+		<!-- Card hover effects -->
+		<Style Selector="Border.Card:pointerover">
+			<Setter Property="BoxShadow" Value="0 4 12 0 #10000000" />
+		</Style>
+
+		<!-- Separator styling -->
+		<Style Selector="Separator">
+			<Setter Property="Background" Value="{DynamicResource DividerBrush}" />
+			<Setter Property="Margin" Value="0,4" />
+		</Style>
+	</UserControl.Styles>
+
+</UserControl>
