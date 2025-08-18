@@ -1,10 +1,11 @@
-﻿# WanderSpire Engine
+﻿![alt text](https://github.com/LudovicLaf/WanderSpire-Engine/blob/main/CSharp/Assets/Icons/banner.png "banner")
 
 A modern, high-performance 2D game engine built in C++ with Entity-Component-System (ECS) architecture, advanced tilemap systems, and comprehensive editor tooling.
 
 ## 📑 Table of Contents
 
 ### [🚀 Native Engine (C++)](#native-engine-core)
+
 - [Features](#🚀-features)
   - [Core Engine](#core-engine)
   - [Rendering System](#rendering-system)
@@ -51,6 +52,7 @@ A modern, high-performance 2D game engine built in C++ with Entity-Component-Sys
 - [Future Roadmap](#🔮-future-roadmap)
 
 ### [⚡ ScriptHost Layer (C#)](#scripthost-layer)
+
 - [Key Features](#🎯-key-features)
   - [Managed Engine Wrapper](#managed-engine-wrapper)
   - [Hot-Reloadable Scripting System](#hot-reloadable-scripting-system)
@@ -84,6 +86,7 @@ A modern, high-performance 2D game engine built in C++ with Entity-Component-Sys
 - [Getting Started](#🚀-getting-started)
 
 ### [🎨 Scene Editor (Avalonia UI)](#scene-editor)
+
 - [Core Features](#🎨-core-features)
   - [Visual Scene Editing](#visual-scene-editing)
   - [Asset Management Pipeline](#asset-management-pipeline)
@@ -131,6 +134,7 @@ A modern, high-performance 2D game engine built in C++ with Entity-Component-Sys
 ## 🚀 Features
 
 ### Core Engine
+
 - **ECS Architecture**: Built on EnTT for high-performance entity management
 - **Modern C++17**: Clean, maintainable codebase with RAII and smart pointers
 - **Cross-Platform**: SDL3-based windowing and input handling
@@ -138,6 +142,7 @@ A modern, high-performance 2D game engine built in C++ with Entity-Component-Sys
 - **Hot-Reload**: Real-time asset reloading for rapid development
 
 ### Rendering System
+
 - **Command-Based Rendering**: Layered rendering pipeline with automatic sorting
 - **Sprite Batching**: Efficient instanced rendering for tilemaps and sprites
 - **Texture Atlases**: Automatic atlas generation and management
@@ -145,6 +150,7 @@ A modern, high-performance 2D game engine built in C++ with Entity-Component-Sys
 - **Debug Overlays**: Grid visualization and entity debugging
 
 ### Tilemap System
+
 - **Chunked Loading**: Dynamic chunk streaming for infinite worlds
 - **Multi-Layer Support**: Layered tilemaps with sorting and blending
 - **Collision Detection**: Built-in pathfinding and obstacle systems
@@ -152,6 +158,7 @@ A modern, high-performance 2D game engine built in C++ with Entity-Component-Sys
 - **Paint Tools**: Comprehensive tile editing with brushes and patterns
 
 ### Editor Framework
+
 - **Command Pattern**: Full undo/redo system for all editor operations
 - **Scene Hierarchy**: Tree-based scene management with parent-child relationships
 - **Selection System**: Multi-selection with spatial queries
@@ -159,6 +166,7 @@ A modern, high-performance 2D game engine built in C++ with Entity-Component-Sys
 - **Spatial Partitioning**: Quadtree-based culling and selection
 
 ### Asset Management
+
 - **Asynchronous Loading**: Non-blocking asset loading with worker threads
 - **Hot-Reload**: Real-time texture and shader recompilation
 - **Prefab System**: JSON-based prefab definitions with component serialization
@@ -194,6 +202,7 @@ tests/                     # Unit tests
 ### Core Systems
 
 #### Entity-Component-System (ECS)
+
 Built on EnTT for maximum performance:
 
 ```cpp
@@ -214,6 +223,7 @@ for (auto entity : view) {
 ```
 
 #### Component System
+
 Over 30 specialized components including:
 
 - **Spatial**: `TransformComponent`, `GridPositionComponent`, `SceneNodeComponent`
@@ -223,6 +233,7 @@ Over 30 specialized components including:
 - **Gameplay**: `ObstacleComponent`, `PlayerTagComponent`, `FacingComponent`
 
 #### Rendering Pipeline
+
 Command-based rendering with automatic layer sorting:
 
 ```cpp
@@ -235,6 +246,7 @@ renderManager.ExecuteFrame(); // Automatically sorts by layer and executes
 ```
 
 #### Tilemap System
+
 Modern ECS-based tilemap with chunked loading:
 
 ```cpp
@@ -254,12 +266,15 @@ tilemapSystem.UpdateTilemapStreaming(registry, viewCenter, viewRadius);
 ## 🛠️ Build Instructions
 
 ### Prerequisites
+
 - **C++17** compatible compiler (GCC 9+, Clang 10+, MSVC 2019+)
 - **CMake 3.20+**
 - **vcpkg** for dependency management
 
 ### Dependencies
+
 The engine uses the following libraries (managed via vcpkg):
+
 - **SDL3**: Windowing and input
 - **OpenGL**: Graphics rendering (via glad)
 - **GLM**: Mathematics library
@@ -271,18 +286,21 @@ The engine uses the following libraries (managed via vcpkg):
 ### Building
 
 1. **Clone the repository**:
+
 ```bash
 git clone https://github.com/yourusername/wanderspire.git
 cd wanderspire
 ```
 
 2. **Setup vcpkg** (if not already installed):
+
 ```bash
 git clone https://github.com/Microsoft/vcpkg.git
 ./vcpkg/bootstrap-vcpkg.sh
 ```
 
 3. **Configure and build**:
+
 ```bash
 cmake --preset=default
 cmake --build build
@@ -305,9 +323,9 @@ The project uses modern CMake with presets. Key targets:
 
 int main(int argc, char* argv[]) {
     // SDL3 main loop - engine handles everything
-    return SDL_AppInit(&Application::AppInit, 
+    return SDL_AppInit(&Application::AppInit,
                       &Application::AppEvent,
-                      &Application::AppIterate, 
+                      &Application::AppIterate,
                       &Application::AppQuit);
 }
 ```
@@ -318,23 +336,23 @@ int main(int argc, char* argv[]) {
 void InitializeScene(AppState* state) {
     auto& registry = state->world.GetRegistry();
     auto& prefabManager = state->ctx.prefabs;
-    
+
     // Create tilemap
     auto& tilemapSystem = TilemapSystem::GetInstance();
     auto tilemap = tilemapSystem.CreateTilemap(registry, "MainWorld");
     auto groundLayer = tilemapSystem.CreateTilemapLayer(registry, tilemap, "Ground");
-    
+
     // Set some tiles
     for (int x = 0; x < 20; ++x) {
         for (int y = 0; y < 20; ++y) {
             tilemapSystem.SetTile(registry, groundLayer, {x, y}, 1); // Grass tile
         }
     }
-    
+
     // Spawn entities from prefabs
     auto player = prefabManager.Instantiate("player", registry, {10, 10});
     auto enemy = prefabManager.Instantiate("orc", registry, {15, 15});
-    
+
     // Set camera target
     state->SetCameraTarget(player);
 }
@@ -347,11 +365,11 @@ class CustomSystem {
 public:
     static void Update(entt::registry& registry, float deltaTime) {
         auto view = registry.view<TransformComponent, MyCustomComponent>();
-        
+
         for (auto entity : view) {
             auto& transform = view.get<TransformComponent>(entity);
             auto& custom = view.get<MyCustomComponent>(entity);
-            
+
             // Update logic here
             transform.localPosition += custom.velocity * deltaTime;
         }
@@ -401,11 +419,12 @@ selectionManager.SelectInBounds(registry, minBounds, maxBounds);
 The engine includes comprehensive unit tests covering:
 
 - **Reflection System**: Component serialization and metadata
-- **Pathfinding**: A* algorithm and tilemap navigation
+- **Pathfinding**: A\* algorithm and tilemap navigation
 - **Prefab System**: JSON loading and entity instantiation
 - **Serialization**: Save/load functionality
 
 Run tests with:
+
 ```bash
 cd build
 ctest --verbose
@@ -414,6 +433,7 @@ ctest --verbose
 ## 📁 Asset Pipeline
 
 ### Supported Formats
+
 - **Images**: PNG, JPG, JPEG
 - **Scenes**: JSON with component serialization
 - **Prefabs**: JSON with component definitions
@@ -421,6 +441,7 @@ ctest --verbose
 - **Configurations**: JSON config files
 
 ### Directory Structure
+
 ```
 Assets/
 ├── textures/           # Individual sprites
@@ -434,6 +455,7 @@ Assets/
 ```
 
 ### Atlas Generation
+
 The engine automatically generates texture atlases from directories:
 
 ```cpp
@@ -447,54 +469,59 @@ resourceManager.RegisterSpritesheets("SpriteSheets");
 ## 🔧 Configuration
 
 ### Engine Configuration (config/engine.json)
+
 ```json
 {
-    "tileSize": 64.0,
-    "tickInterval": 0.016,
-    "chunkSize": 32,
-    "assetsRoot": "Assets/",
-    "mapsRoot": "Assets/maps/"
+  "tileSize": 64.0,
+  "tickInterval": 0.016,
+  "chunkSize": 32,
+  "assetsRoot": "Assets/",
+  "mapsRoot": "Assets/maps/"
 }
 ```
 
 ### Prefab Definition Example
+
 ```json
 {
-    "name": "player",
-    "components": {
-        "TransformComponent": {
-            "localPosition": [0, 0],
-            "localScale": [1, 1]
-        },
-        "SpriteAnimationComponent": {
-            "frameWidth": 64,
-            "frameHeight": 64,
-            "frameCount": 4,
-            "frameDuration": 0.2
-        },
-        "GridPositionComponent": {
-            "tile": [0, 0]
-        },
-        "PlayerTagComponent": {}
-    }
+  "name": "player",
+  "components": {
+    "TransformComponent": {
+      "localPosition": [0, 0],
+      "localScale": [1, 1]
+    },
+    "SpriteAnimationComponent": {
+      "frameWidth": 64,
+      "frameHeight": 64,
+      "frameCount": 4,
+      "frameDuration": 0.2
+    },
+    "GridPositionComponent": {
+      "tile": [0, 0]
+    },
+    "PlayerTagComponent": {}
+  }
 }
 ```
 
 ## 🚀 Performance Features
 
 ### Memory Management
+
 - **Smart Pointers**: RAII-based resource management
 - **Object Pooling**: Efficient entity recycling
 - **Chunk Streaming**: Load only visible world sections
 - **Asset Caching**: Shared texture and resource references
 
 ### Rendering Optimizations
+
 - **Instanced Rendering**: Single draw call for similar objects
 - **Frustum Culling**: Only render visible entities
 - **Layer Sorting**: Automatic depth sorting
 - **Texture Atlasing**: Reduce texture binding overhead
 
 ### Threading
+
 - **Async Asset Loading**: Non-blocking resource loading
 - **Worker Thread Pool**: Background processing
 - **Main Thread Safety**: Clean separation of concerns
@@ -504,6 +531,7 @@ resourceManager.RegisterSpritesheets("SpriteSheets");
 The native engine is designed to integrate with managed languages:
 
 ### C API Layer (EngineCore)
+
 ```c
 // C API for managed integration
 WANDERSPIRE_API void Engine_Init(int width, int height);
@@ -514,6 +542,7 @@ WANDERSPIRE_API void Engine_AddComponent(EntityId id, const char* type, const ch
 ```
 
 ### Event System
+
 ```cpp
 // Global event bus for loose coupling
 EventBus::Get().Subscribe<MoveCompletedEvent>([](const auto& event) {
@@ -526,6 +555,7 @@ EventBus::Get().Publish<AttackEvent>({attacker, target, damage});
 ## 📚 Key Classes Reference
 
 ### Core Classes
+
 - **`Application`**: Main application lifecycle and SDL integration
 - **`World`**: ECS world container and system coordinator
 - **`RenderManager`**: Command-based rendering pipeline
@@ -533,6 +563,7 @@ EventBus::Get().Publish<AttackEvent>({attacker, target, damage});
 - **`PrefabManager`**: JSON-based entity templates
 
 ### Component Categories
+
 - **Transform**: Position, rotation, scale, hierarchy
 - **Rendering**: Sprites, animations, layers, culling
 - **Tilemap**: Chunks, layers, brushes, auto-tiling
@@ -540,6 +571,7 @@ EventBus::Get().Publish<AttackEvent>({attacker, target, damage});
 - **Gameplay**: Player tags, obstacles, AI behaviors
 
 ### System Categories
+
 - **Core**: Animation, rendering, input, ticking
 - **Editor**: Commands, selection, spatial partitioning
 - **World**: Pathfinding, chunk streaming, tile management
@@ -563,18 +595,21 @@ The ScriptHost layer provides a comprehensive C# managed wrapper around the nati
 ## 🎯 Key Features
 
 ### Managed Engine Wrapper
+
 - **Complete P/Invoke API**: Full C# bindings for all native engine functionality
 - **Type-Safe Components**: Strongly-typed DTOs mirroring native ECS components
 - **Memory-Safe Operations**: Automatic marshaling and resource management
 - **Cross-Platform**: Runs on Windows, Linux, and macOS through .NET 8
 
 ### Hot-Reloadable Scripting System
+
 - **Dynamic Script Loading**: CSX scripts loaded at runtime with automatic recompilation
 - **Behaviour System**: Unity-style MonoBehaviour pattern for entity logic
 - **Live Code Updates**: Modify scripts while the game is running without restart
 - **Script Data Persistence**: Entity script state survives hot-reloads
 
 ### Advanced Gameplay Systems
+
 - **ECS Integration**: Direct access to EnTT registry through managed wrappers
 - **Event-Driven Architecture**: Type-safe managed event bus with native event forwarding
 - **Interpolation System**: Smooth 60fps visual movement over logical tick-based updates
@@ -582,6 +617,7 @@ The ScriptHost layer provides a comprehensive C# managed wrapper around the nati
 - **Combat System**: Damage calculation, health management, and death/respawn logic
 
 ### Developer Tools
+
 - **Comprehensive Debug UI**: 18+ ImGui debug windows for real-time engine inspection
 - **Performance Profiling**: Frame timing, memory usage, and system performance monitoring
 - **Entity Inspector**: Live component editing and scene graph visualization
@@ -601,6 +637,7 @@ CSharp/
 ### Core Components
 
 #### ScriptHost Assembly
+
 The foundational layer providing engine integration:
 
 - **EngineInterop.cs**: Complete P/Invoke bindings for native API
@@ -660,12 +697,14 @@ public class PlayerController : Behaviour
 The system uses a hybrid event architecture:
 
 #### Native Events (Engine → Managed)
+
 - **LogicTickEvent**: Precise timing for game logic
-- **MoveCompletedEvent**: Entity movement notifications  
+- **MoveCompletedEvent**: Entity movement notifications
 - **AnimationFinishedEvent**: Animation state management
 - **FrameRenderEvent**: Per-frame rendering callbacks
 
 #### Managed Events (Game Logic)
+
 - **AttackEvent**: Combat system integration
 - **HurtEvent**: Damage and health management
 - **DeathEvent**: Entity lifecycle management
@@ -696,6 +735,7 @@ The included Game assembly demonstrates a complete 2D RPG implementation:
 ### Core Systems
 
 #### Movement System
+
 ```csharp
 public sealed class MovementSystem : ITickReceiver
 {
@@ -708,7 +748,8 @@ public sealed class MovementSystem : ITickReceiver
 }
 ```
 
-#### Interpolation System  
+#### Interpolation System
+
 ```csharp
 public sealed class InterpolationSystem : ITickReceiver
 {
@@ -722,11 +763,12 @@ public sealed class InterpolationSystem : ITickReceiver
 ```
 
 #### AI Behaviour
+
 ```csharp
 public class AIBehaviour : Behaviour
 {
     private enum State { Idle, Wander, Chase, Attack, Return, Dead }
-    
+
     public override void Update(float dt)
     {
         // Faction-based hostility detection
@@ -740,7 +782,7 @@ public class AIBehaviour : Behaviour
 ### Game Features
 
 - **Grid-Based Movement**: Discrete tile movement with smooth visual interpolation
-- **Combat System**: Turn-based combat with damage calculation and animations  
+- **Combat System**: Turn-based combat with damage calculation and animations
 - **AI Behaviors**: Faction-based NPCs with wandering, chasing, and combat
 - **Scene Management**: JSON-based scene loading with entity persistence
 - **Asset Pipeline**: Automatic prefab loading and hot-reload support
@@ -750,6 +792,7 @@ public class AIBehaviour : Behaviour
 ### Setting Up a New Behaviour
 
 1. **Create the Script**:
+
 ```csharp
 public class MyBehaviour : Behaviour
 {
@@ -759,12 +802,14 @@ public class MyBehaviour : Behaviour
 ```
 
 2. **Register in Factory**:
+
 ```csharp
 // Automatically discovered via reflection in ScriptRegistry
 // No manual registration needed
 ```
 
 3. **Attach to Prefab**:
+
 ```json
 {
   "name": "my_entity",
@@ -819,13 +864,14 @@ SceneManager.Load("Assets/maps/example.json");
 ### Project Configuration
 
 **ScriptHost.csproj**:
+
 ```xml
 <Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <TargetFramework>net8.0</TargetFramework>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
   </PropertyGroup>
-  
+
   <ItemGroup>
     <PackageReference Include="Microsoft.CodeAnalysis.CSharp.Scripting" Version="4.8.0" />
     <Content Include="../../Assets/Scripts/**/*.csx" CopyToOutputDirectory="PreserveNewest" />
@@ -836,18 +882,21 @@ SceneManager.Load("Assets/maps/example.json");
 ## 📊 Performance Characteristics
 
 ### Memory Management
+
 - **Zero-Copy Interop**: Direct memory access for component data
 - **Managed Object Pooling**: Automatic entity and component recycling
 - **Script Data Persistence**: Minimal allocation during hot-reloads
 - **Native Resource Tracking**: Automatic cleanup of engine resources
 
 ### Threading Model
+
 - **Main Thread**: All managed code and script execution
 - **Logic Ticks**: Precise timing on dedicated thread with marshaling
 - **Render Thread**: Native rendering with managed overlay submission
 - **Asset Loading**: Background asset streaming with main thread sync
 
 ### Typical Performance
+
 - **Logic Tick Rate**: 0.6s intervals (RuneScape-style)
 - **Render Rate**: 60fps with smooth interpolation
 - **Script Reload Time**: <100ms for typical behaviour changes
@@ -917,6 +966,7 @@ The Scene Editor is a comprehensive, cross-platform visual editor built on Avalo
 ## 🎨 Core Features
 
 ### Visual Scene Editing
+
 - **Unified GameObject System**: Edit both scene instances and prefab definitions in a single interface
 - **Real-time Viewport**: Hardware-accelerated OpenGL rendering with live scene preview
 - **Multi-Tool Editor**: Professional tool system for selection, transformation, and tile painting
@@ -924,6 +974,7 @@ The Scene Editor is a comprehensive, cross-platform visual editor built on Avalo
 - **Scene Hierarchy**: Tree-based scene management with drag-and-drop organization
 
 ### Asset Management Pipeline
+
 - **Modern Asset Browser**: Tree, grid, and list views with real-time search and filtering
 - **Hot-Reload Support**: Automatic asset reloading when files change on disk
 - **Asset Creation Wizards**: Built-in templates for scenes, prefabs, scripts, and more
@@ -931,6 +982,7 @@ The Scene Editor is a comprehensive, cross-platform visual editor built on Avalo
 - **Import Pipeline**: Drag-and-drop importing with automatic format detection
 
 ### Advanced Tilemap Editor
+
 - **Visual Tile Painting**: Brush-based tile placement with multiple brush types and sizes
 - **Layer Management**: Multi-layer tilemap support with visibility and lock controls
 - **Tile Palette System**: Visual tile selection with atlas-based organization
@@ -938,6 +990,7 @@ The Scene Editor is a comprehensive, cross-platform visual editor built on Avalo
 - **Collision Editing**: Visual editing of tile collision properties
 
 ### Professional Workflow Tools
+
 - **Command System**: Full undo/redo support for all editor operations
 - **Docking Layout**: Customizable, resizable panel system with save/restore
 - **Theme System**: Light/Dark theme support with system integration
@@ -947,6 +1000,7 @@ The Scene Editor is a comprehensive, cross-platform visual editor built on Avalo
 ## 🏗️ Architecture Overview
 
 ### MVVM Architecture
+
 The Scene Editor follows the Model-View-ViewModel pattern with ReactiveUI for robust data binding:
 
 ```
@@ -979,6 +1033,7 @@ Services/            # Core business services
 ```
 
 ### Service-Oriented Design
+
 Core functionality is organized into focused services with dependency injection:
 
 - **EditorEngine**: Manages native engine lifecycle and P/Invoke bindings
@@ -990,6 +1045,7 @@ Core functionality is organized into focused services with dependency injection:
 ## 🎮 GameObject & Prefab System
 
 ### Unified Entity Management
+
 The Scene Editor treats GameObjects and Prefabs as part of a unified system:
 
 ```csharp
@@ -1003,6 +1059,7 @@ gameObjectService.SavePrefab(prefab);
 ```
 
 ### Component System Integration
+
 Direct integration with the native ECS system:
 
 ```csharp
@@ -1024,6 +1081,7 @@ public class TransformComponentEditor : ComponentEditorViewModel
 ## 🛠️ Editor Tools System
 
 ### Extensible Tool Architecture
+
 The editor provides a plugin-like tool system:
 
 ```csharp
@@ -1032,7 +1090,7 @@ public interface IEditorTool
     string Name { get; }
     string DisplayName { get; }
     string Icon { get; }
-    
+
     void OnActivate();
     void OnMouseDown(float worldX, float worldY, ViewportInputModifiers modifiers);
     void OnDrag(float worldX, float worldY, ViewportInputModifiers modifiers);
@@ -1049,6 +1107,7 @@ public interface IEditorTool
 ```
 
 ### Viewport Integration
+
 Tools receive viewport events and can render custom overlays:
 
 ```csharp
@@ -1064,6 +1123,7 @@ var bounds = viewport.GetViewportBounds();
 ## 📁 Asset Management
 
 ### File System Integration
+
 The Asset Browser provides comprehensive file management:
 
 ```csharp
@@ -1083,6 +1143,7 @@ var newPrefab = await assetService.CreateAssetAsync("Enemy", AssetType.Prefab);
 ```
 
 ### Asset Types & Operations
+
 Comprehensive support for game asset types:
 
 - **Scenes**: JSON-based scene definitions with entity hierarchies
@@ -1096,6 +1157,7 @@ Comprehensive support for game asset types:
 ## 🎯 Professional UI Features
 
 ### Modern Docking System
+
 Built on Dock.Avalonia for professional layout management:
 
 ```csharp
@@ -1109,6 +1171,7 @@ layoutManager.RestoreUserLayout("Default");
 ```
 
 ### Theme System
+
 Comprehensive theming with system integration:
 
 ```csharp
@@ -1124,6 +1187,7 @@ themeService.ToggleTheme();
 ```
 
 ### Command System
+
 Professional undo/redo with command pattern:
 
 ```csharp
@@ -1139,12 +1203,14 @@ if (commandService.CanUndo)
 ## 🔧 Performance & Optimization
 
 ### Efficient Rendering Pipeline
+
 - **Hardware Acceleration**: OpenGL-based viewport with 60fps target
 - **Frustum Culling**: Only render visible entities and tiles
 - **Instanced Rendering**: Batch similar objects for GPU efficiency
 - **Progressive Loading**: Stream large scenes without blocking UI
 
 ### Memory Management
+
 - **Smart Caching**: Asset caching with automatic cleanup
 - **Object Pooling**: Reuse UI elements and temporary objects
 - **Lazy Loading**: Load assets on-demand to reduce startup time
@@ -1153,6 +1219,7 @@ if (commandService.CanUndo)
 ## 🚀 Getting Started
 
 ### Prerequisites
+
 - **.NET 8.0** or later
 - **Visual Studio 2022** or **JetBrains Rider**
 - **Native WanderSpire Engine** (built separately)
@@ -1160,6 +1227,7 @@ if (commandService.CanUndo)
 ### Building the Scene Editor
 
 1. **Clone and build the native engine first**:
+
 ```bash
 cd WanderSpire/
 cmake --preset=default
@@ -1167,6 +1235,7 @@ cmake --build build --config Release
 ```
 
 2. **Build the Scene Editor**:
+
 ```bash
 cd CSharp/SceneEditor/
 dotnet restore
@@ -1174,11 +1243,13 @@ dotnet build -c Release
 ```
 
 3. **Run the editor**:
+
 ```bash
 dotnet run --project SceneEditor
 ```
 
 ### Project Structure
+
 ```
 SceneEditor/
 ├── Views/              # XAML UI definitions
@@ -1218,32 +1289,32 @@ public class HealthComponentEditor : ComponentEditorViewModel
 {
     private int _maxHealth = 100;
     private int _currentHealth = 100;
-    
+
     public int MaxHealth
     {
         get => _maxHealth;
         set => this.RaiseAndSetIfChanged(ref _maxHealth, value);
     }
-    
+
     public int CurrentHealth
     {
         get => _currentHealth;
         set => this.RaiseAndSetIfChanged(ref _currentHealth, value);
     }
-    
+
     protected override void LoadFromJson(string json)
     {
         var data = JsonSerializer.Deserialize<HealthData>(json);
         MaxHealth = data.MaxHealth;
         CurrentHealth = data.CurrentHealth;
     }
-    
+
     protected override string SaveToJson()
     {
-        return JsonSerializer.Serialize(new HealthData 
-        { 
-            MaxHealth = MaxHealth, 
-            CurrentHealth = CurrentHealth 
+        return JsonSerializer.Serialize(new HealthData
+        {
+            MaxHealth = MaxHealth,
+            CurrentHealth = CurrentHealth
         });
     }
 }
@@ -1271,6 +1342,7 @@ foreach (var scene in scenes)
 ## 🔄 Integration with Native Engine
 
 ### P/Invoke Bridge
+
 Seamless integration with the native C++ engine:
 
 ```csharp
@@ -1278,7 +1350,7 @@ Seamless integration with the native C++ engine:
 public static extern EntityId CreateEntity(IntPtr context);
 
 [DllImport("EngineCore")]
-public static extern int SetComponentJson(IntPtr context, EntityId entity, 
+public static extern int SetComponentJson(IntPtr context, EntityId entity,
     [MarshalAs(UnmanagedType.LPStr)] string componentType,
     [MarshalAs(UnmanagedType.LPStr)] string jsonData);
 
@@ -1294,6 +1366,7 @@ public class Entity
 ```
 
 ### Event System Bridge
+
 Native events forwarded to managed code:
 
 ```csharp
@@ -1310,6 +1383,7 @@ EventBus.Publish(new SceneChangedEvent(scenePath));
 ## 🐛 Development Status
 
 ### ✅ Implemented Features
+
 - **Core Architecture**: MVVM, services, dependency injection
 - **Basic Viewport**: OpenGL rendering, camera controls
 - **GameObject System**: Scene hierarchy, prefab management
@@ -1320,6 +1394,7 @@ EventBus.Publish(new SceneChangedEvent(scenePath));
 - **Docking Layout**: Professional panel management
 
 ### 🚧 Work in Progress
+
 - **Advanced Component Editors**: Type-specific property editing
 - **Tilemap Editor**: Visual tile painting and palette management
 - **Animation Timeline**: Keyframe-based animation editing
@@ -1328,6 +1403,7 @@ EventBus.Publish(new SceneChangedEvent(scenePath));
 - **Plugin System**: Third-party tool and extension support
 
 ### 📋 Planned Features
+
 - **Live Rendering**: Real Time hot reload and scene building
 - **Visual Scripting**: Node-based logic editing
 - **Terrain Editor**: Height-based terrain sculpting
