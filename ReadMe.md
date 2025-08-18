@@ -1,4 +1,4 @@
-﻿![alt text](https://github.com/LudovicLaf/WanderSpire-Engine/blob/main/CSharp/Assets/Icons/banner2.webp "banner")
+﻿![alt text](https://github.com/LudovicLaf/WanderSpire-Engine/blob/main/CSharp/Assets/Icons/banner3.webp "banner")
 
 A modern, high-performance 2D game engine built in C++ with Entity-Component-System (ECS) architecture, advanced tilemap systems, and comprehensive editor tooling.
 
